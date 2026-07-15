@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ru" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>История Ислама: от Адама до Мухаммада ﷺ — онлайн-курс</title>
+<meta name="description" content="Онлайн-курс по истории Ислама: единая картина от сотворения мира до рождения Пророка ﷺ. 3 месяца, 24 занятия, Zoom.">
+<meta property="og:title" content="История Ислама: от Адама до Мухаммада ﷺ">
+<meta property="og:description" content="Увидеть историю Ислама единой цельной картиной. Онлайн-курс: 3 месяца · 24 занятия · Zoom.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌙</text></svg>">
+<link rel="stylesheet" href="../shared/base.css?v=7">
+<link rel="stylesheet" href="style.css?v=7">
+</head>
+<body>
+<script>document.documentElement.classList.remove('no-js')</script>
+
+<canvas id="stars" aria-hidden="true"></canvas>
+<div class="dawn" id="dawn" aria-hidden="true"></div>
+<div class="fx-vignette" aria-hidden="true"></div>
+<div class="fx-grain" aria-hidden="true"></div>
+<div class="progress" aria-hidden="true"></div>
+
+<main>
+  <!-- ============ HERO ============ -->
+  <header class="hero">
+    <div class="moon" id="moon" aria-hidden="true">
+      <svg viewBox="0 0 100 100" width="100%" height="100%">
+        <defs>
+          <mask id="crescent"><rect width="100" height="100" fill="#fff"/><circle cx="63" cy="40" r="34" fill="#000"/></mask>
+        </defs>
+        <circle cx="50" cy="50" r="38" fill="#F0DFA8" mask="url(#crescent)"/>
+      </svg>
+    </div>
+    <div class="wrap-narrow hero-inner">
+      <p class="eyebrow gold" data-reveal>Набор на первый поток открыт</p>
+      <h1 data-reveal>История Ислама<br><em>от Адама до Мухаммада ﷺ</em></h1>
+      <p class="hero-lead" data-reveal>Курс, который даст увидеть историю Ислама единой цельной картиной — от сотворения мира до рождения Пророка ﷺ.</p>
+      <div class="hero-cta" data-reveal>
+        <a class="btn btn-gold" data-cta href="#">Записаться на курс</a>
+        <span class="date-chip" data-start-chip></span>
+      </div>
+    </div>
+    <div class="scroll-hint" aria-hidden="true">
+      <span>прокрутите — начнём путь</span>
+      <svg width="14" height="20" viewBox="0 0 14 20"><path d="M7 2v13m0 0 5-5m-5 5-5-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </header>
+
+  <!-- ============ О КУРСЕ ============ -->
+  <section class="about">
+    <div class="wrap-narrow">
+      <p class="eyebrow gold" data-reveal>О курсе</p>
+      <h2 data-reveal>Не набор дат, а единое повествование</h2>
+      <div class="about-text" id="aboutText"></div>
+    </div>
+  </section>
+
+
+  <div class="marquee" aria-hidden="true"><div class="marquee-track" id="marqueeTrack"></div></div>
+
+  <!-- ============ БЛОК 1: МЕТОДОЛОГИЯ ============ -->
+  <section class="method">
+    <div class="wrap">
+      <p class="eyebrow gold" data-reveal id="b1label"></p>
+      <h2 data-reveal id="b1name"></h2>
+      <p class="section-desc" data-reveal id="b1desc"></p>
+      <div class="method-grid" id="methodGrid"></div>
+    </div>
+  </section>
+
+  <!-- ============ БЛОК 2: ПУТЬ ============ -->
+  <section class="journey">
+    <div class="wrap journey-head">
+      <p class="eyebrow gold" data-reveal id="b2label"></p>
+      <h2 data-reveal id="b2name"></h2>
+      <p class="section-desc" data-reveal id="b2desc"></p>
+    </div>
+    <div class="trail" id="trail">
+      <svg class="trail-svg" id="trailSvg" aria-hidden="true">
+        <path id="trailBase" />
+        <path id="trailGold" />
+      </svg>
+      <div class="comet" id="comet" aria-hidden="true"></div>
+      <!-- остановки рендерит app.js -->
+      <div class="destination" id="destination">
+        <div class="dest-star" aria-hidden="true">
+          <svg viewBox="0 0 40 40" width="40" height="40"><path d="M20 2l4.2 12.9H37l-10.4 7.6 4 12.9L20 27.5 9.4 35.4l4-12.9L3 14.9h12.8Z" fill="currentColor"/></svg>
+        </div>
+        <p class="eyebrow gold">Пункт назначения</p>
+        <h3>Рождение Пророка Мухаммада ﷺ</h3>
+        <p class="dest-sub">Финал первого курса — и начало следующей истории.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ФОРМАТ ============ -->
+  <section class="format">
+    <div class="wrap">
+      <p class="eyebrow gold" data-reveal>Как проходит обучение</p>
+      <h2 data-reveal id="fmtName"></h2>
+      <div class="stats" id="stats"></div>
+      <ul class="format-list" id="formatList"></ul>
+    </div>
+  </section>
+
+  <!-- ============ ФИШКИ ============ -->
+  <section class="features">
+    <div class="wrap">
+      <p class="eyebrow gold" data-reveal>Внутри курса</p>
+      <h2 data-reveal id="featName"></h2>
+      <div class="feat-grid" id="featGrid"></div>
+    </div>
+  </section>
+
+  <!-- ============ КОМУ ПОДОЙДЁТ ============ -->
+  <section class="audience">
+    <div class="wrap-narrow">
+      <p class="eyebrow gold" data-reveal>Кому подойдёт</p>
+      <h2 data-reveal id="audName"></h2>
+      <p class="aud-text" data-reveal id="audText"></p>
+      <div class="kids-note" data-reveal>
+        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 1 9l11 6 9-4.9V17h2V9L12 3Zm-7 9.7V17c0 2.2 3.1 4 7 4s7-1.8 7-4v-4.3l-7 3.8-7-3.8Z" fill="currentColor"/></svg>
+        <p id="audKids"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ФИНАЛ ============ -->
+  <section class="final" id="cta">
+    <div class="wrap-narrow final-inner">
+      <p class="eyebrow gold" data-reveal>Маршрут построен</p>
+      <h2 data-reveal id="finalTitle"></h2>
+      <p class="final-sub" data-reveal id="finalSub"></p>
+      <div class="hero-cta" data-reveal>
+        <a class="btn btn-gold" data-cta href="#">Записаться на курс</a>
+        <span class="date-chip" data-start-chip></span>
+      </div>
+      <p class="price-note" data-reveal id="priceNote"></p>
+    </div>
+    <footer class="page-foot">Курс по истории Ислама · первый поток · 2026</footer>
+  </section>
+</main>
+
+<script src="../vendor/gsap.min.js?v=7"></script>
+<script src="../vendor/ScrollTrigger.min.js?v=7"></script>
+<script src="../vendor/lenis.min.js?v=7"></script>
+<script src="../shared/config.js?v=7"></script>
+<script src="../shared/content.js?v=7"></script>
+<script src="../shared/render.js?v=7"></script>
+<script src="../shared/fx.js?v=7"></script>
+<script src="starfield.js?v=7"></script>
+<script src="app.js?v=7"></script>
+</body>
+</html>

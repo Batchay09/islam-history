@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ru" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>История Ислама: от Адама до Мухаммада ﷺ — онлайн-курс</title>
+<meta name="description" content="Онлайн-курс по истории Ислама: единая картина от сотворения мира до рождения Пророка ﷺ. 3 месяца, 24 занятия, Zoom.">
+<meta property="og:title" content="История Ислама: от Адама до Мухаммада ﷺ">
+<meta property="og:description" content="Увидеть историю Ислама единой цельной картиной. Онлайн-курс: 3 месяца · 24 занятия · Zoom.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
+<link rel="stylesheet" href="../shared/base.css?v=5">
+<link rel="stylesheet" href="style.css?v=5">
+</head>
+<body>
+<script>document.documentElement.classList.remove('no-js')</script>
+
+<div class="nebula-wrap" id="nebulaWrap" aria-hidden="true">
+  <div class="nebula n1"></div>
+  <div class="nebula n2"></div>
+  <div class="nebula n3"></div>
+</div>
+<canvas id="cosmos" aria-hidden="true"></canvas>
+<div class="fx-vignette" aria-hidden="true"></div>
+<div class="fx-grain" aria-hidden="true"></div>
+<div class="bar bar-t" id="barT" aria-hidden="true"></div>
+<div class="bar bar-b" id="barB" aria-hidden="true"></div>
+<div class="progress" aria-hidden="true"></div>
+
+<main>
+  <!-- ============ ПРОЛОГ (pin) ============ -->
+  <section class="prologue" id="prologue">
+    <div class="genesis" id="genesis" aria-hidden="true"></div>
+    <div class="phase phase-1" id="phase1">
+      <p class="eyebrow star-c" data-reveal>Онлайн-курс · набор на первый поток</p>
+      <h1 data-reveal>История Ислама<br><em>от Адама до Мухаммада ﷺ</em></h1>
+      <p class="hero-lead" data-reveal>Единая картина истории — от сотворения мира до рождения Пророка ﷺ.</p>
+      <div class="hero-cta" data-reveal>
+        <a class="btn btn-star" data-cta href="#">Записаться на курс</a>
+        <span class="date-chip" data-start-chip></span>
+      </div>
+      <div class="scroll-hint" aria-hidden="true">
+        <span>прокрутите — да будет свет</span>
+        <svg width="14" height="20" viewBox="0 0 14 20"><path d="M7 2v13m0 0 5-5m-5 5-5-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+    <div class="phase phase-2" id="phase2">
+      <p class="eyebrow star-c">Первая тема курса</p>
+      <h2 class="phase-title">Всё начинается<br>с сотворения Вселенной</h2>
+      <p class="phase-sub">Что Коран и Сунна сообщают о рождении мира — с этого откроется курс.</p>
+    </div>
+    <div class="phase phase-3" id="phase3">
+      <p class="eyebrow star-c">…и ведёт вниз, к Земле</p>
+      <h2 class="phase-title">К землям пророков<br>и народам древности</h2>
+      <p class="phase-sub">11 тем — от Адама ﷺ до рождения Пророка Мухаммада ﷺ.</p>
+    </div>
+    <div class="earth" id="earth" aria-hidden="true"></div>
+  </section>
+
+  <!-- ============ О КУРСЕ ============ -->
+  <section class="about">
+    <div class="wrap-narrow">
+      <p class="eyebrow star-c" data-reveal>О курсе</p>
+      <h2 class="shimmer" data-reveal>Не набор дат, а единое повествование</h2>
+      <div class="about-text" id="aboutText"></div>
+    </div>
+  </section>
+
+
+  <div class="marquee" aria-hidden="true"><div class="marquee-track" id="marqueeTrack"></div></div>
+
+  <!-- ============ БЛОК 1 ============ -->
+  <section class="method">
+    <div class="wrap">
+      <p class="eyebrow star-c" data-reveal id="b1label"></p>
+      <h2 class="shimmer" data-reveal id="b1name"></h2>
+      <p class="section-desc" data-reveal id="b1desc"></p>
+      <div class="method-grid" id="methodGrid"></div>
+    </div>
+  </section>
+
+  <!-- ============ БЛОК 2: ТЕМЫ + КАРТА ============ -->
+  <section class="journey">
+    <div class="wrap journey-head">
+      <p class="eyebrow star-c" data-reveal id="b2label"></p>
+      <h2 class="shimmer" data-reveal id="b2name"></h2>
+      <p class="section-desc" data-reveal id="b2desc"></p>
+    </div>
+    <div class="wrap journey-grid">
+      <div class="topics">
+        <div class="trail" id="trail">
+          <div class="destination" id="destination">
+            <div class="dest-star" aria-hidden="true">
+              <svg viewBox="0 0 40 40" width="40" height="40"><path d="M20 2l4.2 12.9H37l-10.4 7.6 4 12.9L20 27.5 9.4 35.4l4-12.9L3 14.9h12.8Z" fill="currentColor"/></svg>
+            </div>
+            <p class="eyebrow star-c">Пункт назначения</p>
+            <h3>Рождение Пророка Мухаммада ﷺ</h3>
+            <p class="dest-sub">Финал первого курса — и начало следующей истории.</p>
+          </div>
+        </div>
+      </div>
+      <aside class="map-side" aria-label="Карта земель пророков">
+        <div class="map-card">
+          <svg id="mapSvg" viewBox="0 0 460 380" aria-hidden="true">
+            <!-- условные берега -->
+            <path class="land" d="M10 210 C 60 170, 90 190, 120 168 C 160 140, 150 110, 190 96 C 230 82, 260 108, 300 92 C 340 76, 380 96, 450 70"/>
+            <path class="land" d="M20 300 C 80 270, 140 296, 200 272 C 270 246, 320 276, 390 250 C 415 242, 435 246, 452 238"/>
+            <path class="land" d="M300 330 C 330 300, 330 260, 356 230 C 376 208, 380 180, 372 150"/>
+            <!-- маршруты -->
+            <path class="route" id="routePath" d="M96 236 C 140 210, 180 196, 216 176 C 246 160, 286 156, 316 128 C 336 110, 356 118, 368 96 M216 176 C 256 210, 300 250, 336 292"/>
+            <!-- города: подсвечиваются при чтении тем -->
+            <g class="city" data-city="0"><circle cx="96"  cy="236" r="5"/><circle class="halo" cx="96"  cy="236" r="5"/><text x="96"  y="260">Египет</text></g>
+            <g class="city" data-city="1"><circle cx="216" cy="176" r="5"/><circle class="halo" cx="216" cy="176" r="5"/><text x="216" y="200">Иерусалим</text></g>
+            <g class="city" data-city="2"><circle cx="316" cy="128" r="5"/><circle class="halo" cx="316" cy="128" r="5"/><text x="316" y="112">Шам</text></g>
+            <g class="city" data-city="3"><circle cx="368" cy="96"  r="5"/><circle class="halo" cx="368" cy="96"  r="5"/><text x="368" y="80">Вавилон</text></g>
+            <g class="city" data-city="4"><circle cx="336" cy="292" r="5"/><circle class="halo" cx="336" cy="292" r="5"/><text x="336" y="316">Мекка</text></g>
+          </svg>
+          <p class="map-cap">Интерактивные карты — часть курса: земли пророков, народы и цивилизации</p>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============ ФОРМАТ ============ -->
+  <section class="format">
+    <div class="wrap">
+      <p class="eyebrow star-c" data-reveal>Как проходит обучение</p>
+      <h2 class="shimmer" data-reveal id="fmtName"></h2>
+      <div class="stats" id="stats"></div>
+      <ul class="format-list" id="formatList"></ul>
+    </div>
+  </section>
+
+  <!-- ============ ФИШКИ ============ -->
+  <section class="features">
+    <div class="wrap">
+      <p class="eyebrow star-c" data-reveal>Внутри курса</p>
+      <h2 class="shimmer" data-reveal id="featName"></h2>
+      <div class="feat-grid" id="featGrid"></div>
+    </div>
+  </section>
+
+  <!-- ============ КОМУ ПОДОЙДЁТ ============ -->
+  <section class="audience">
+    <div class="wrap-narrow">
+      <p class="eyebrow star-c" data-reveal>Кому подойдёт</p>
+      <h2 class="shimmer" data-reveal id="audName"></h2>
+      <p class="aud-text" data-reveal id="audText"></p>
+      <div class="kids-note" data-reveal>
+        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 1 9l11 6 9-4.9V17h2V9L12 3Zm-7 9.7V17c0 2.2 3.1 4 7 4s7-1.8 7-4v-4.3l-7 3.8-7-3.8Z" fill="currentColor"/></svg>
+        <p id="audKids"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ФИНАЛ ============ -->
+  <section class="final" id="cta">
+    <div class="wrap-narrow final-inner">
+      <p class="eyebrow star-c" data-reveal>Путь начинается здесь</p>
+      <h2 data-reveal id="finalTitle"></h2>
+      <p class="final-sub" data-reveal id="finalSub"></p>
+      <div class="hero-cta" data-reveal>
+        <a class="btn btn-star" data-cta href="#">Записаться на курс</a>
+        <span class="date-chip" data-start-chip></span>
+      </div>
+      <p class="price-note" data-reveal id="priceNote"></p>
+    </div>
+    <footer class="page-foot">Курс по истории Ислама · первый поток · 2026</footer>
+  </section>
+</main>
+
+<script src="../vendor/gsap.min.js?v=5"></script>
+<script src="../vendor/ScrollTrigger.min.js?v=5"></script>
+<script src="../vendor/lenis.min.js?v=5"></script>
+<script src="../shared/config.js?v=5"></script>
+<script src="../shared/content.js?v=5"></script>
+<script src="../shared/render.js?v=5"></script>
+<script src="../shared/fx.js?v=5"></script>
+<script src="cosmos.js?v=5"></script>
+<script src="app.js?v=5"></script>
+</body>
+</html>

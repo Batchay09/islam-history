@@ -1,0 +1,572 @@
+/* Вариант Б «Манускрипт» — бумага, чернила, золото */
+
+:root {
+  --paper0: #F6EDD8;
+  --paper1: #EFE0BE;
+  --paper2: #E7D2A8;
+  --ink: #3B2A18;
+  --ink-soft: #6E4E1E;
+  --muted: #7A5E33;
+  --gold: #B8912C;
+  --gold-deep: #8C6420;
+  --line: rgba(110, 78, 30, .35);
+}
+
+:root {
+  --vignette: rgba(70, 45, 10, .14); /* мягче: основное затемнение даёт свеча */
+  --grain: .07;
+  --progress: linear-gradient(90deg, #6E4E1E, #B8912C);
+}
+
+body {
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+  background:
+    radial-gradient(ellipse 8% 5% at 78% 22%, rgba(150, 105, 45, .1), transparent 100%),
+    radial-gradient(ellipse 6% 4% at 12% 64%, rgba(150, 105, 45, .12), transparent 100%),
+    radial-gradient(ellipse 10% 6% at 55% 88%, rgba(150, 105, 45, .08), transparent 100%),
+    radial-gradient(ellipse at 15% 8%, rgba(210, 180, 120, .28), transparent 46%),
+    radial-gradient(ellipse at 88% 92%, rgba(190, 150, 90, .3), transparent 50%),
+    repeating-linear-gradient(2deg, rgba(160, 120, 60, .04) 0 3px, transparent 3px 7px),
+    linear-gradient(170deg, var(--paper0) 0%, var(--paper1) 55%, var(--paper2) 100%);
+}
+
+/* лёгкая 3D-сцена: секции входят как перелистываемые страницы;
+   overflow-x: clip прячет расширение проекции при повороте */
+main { perspective: 1400px; overflow-x: clip; }
+
+.eyebrow.ink { color: var(--gold-deep); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+
+h1 { font-size: clamp(38px, 7.4vw, 86px); font-weight: 700; line-height: 1.08; }
+h1 em, h2 em { font-style: italic; color: var(--gold-deep); }
+h2 { font-size: clamp(25px, 4vw, 38px); margin: 12px 0 18px; }
+h3 { font-size: clamp(18px, 2.5vw, 23px); }
+
+.section-desc { color: var(--muted); max-width: 62ch; font-size: 17px; }
+
+section, .hero { padding: clamp(80px, 11vh, 140px) 0; }
+
+/* ---------- Кнопки, чипы ---------- */
+.btn-ink {
+  background: var(--ink);
+  color: var(--paper0);
+  border-radius: 4px;
+  letter-spacing: .05em;
+  box-shadow: 0 6px 20px -6px rgba(59, 42, 24, .5);
+}
+.btn-ink:hover { background: #59401F; }
+
+.date-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 10px 18px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+.date-chip b { color: var(--ink); font-weight: 600; }
+
+/* ---------- Орнаментальные уголки ---------- */
+.corner {
+  position: absolute;
+  width: clamp(40px, 6vw, 64px);
+  height: clamp(40px, 6vw, 64px);
+  color: var(--gold-deep);
+  opacity: .7;
+  pointer-events: none;
+}
+.corner.tl { top: 22px; left: 22px; }
+.corner.tr { top: 22px; right: 22px; transform: rotate(90deg); }
+.corner.bl { bottom: 22px; left: 22px; transform: rotate(-90deg); }
+.corner.br { bottom: 22px; right: 22px; transform: rotate(180deg); }
+
+/* ---------- Hero ---------- */
+.hero {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  text-align: center;
+}
+.cap-title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 18px;
+  text-align: left;
+}
+.drop-cap {
+  flex: none;
+  width: clamp(64px, 9vw, 92px);
+  height: clamp(64px, 9vw, 92px);
+  background: linear-gradient(135deg, var(--gold), var(--gold-deep));
+  color: var(--paper0);
+  font-size: clamp(40px, 6vw, 60px);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 2px rgba(246, 237, 216, .4), 0 6px 18px -6px rgba(90, 60, 10, .55);
+  margin-top: 6px;
+}
+.hero-lead {
+  color: var(--muted);
+  font-size: clamp(16px, 2.2vw, 19px);
+  font-style: italic;
+  max-width: 54ch;
+  margin: 24px auto 0;
+}
+.hero-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 34px;
+}
+.scroll-hint {
+  position: absolute;
+  bottom: 26px;
+  left: 0; right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 11.5px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+.scroll-hint svg { animation: hint-bob 2s ease-in-out infinite; }
+@keyframes hint-bob {
+  0%, 100% { transform: translateY(0); opacity: .5; }
+  50% { transform: translateY(7px); opacity: 1; }
+}
+
+/* ---------- Разделители ---------- */
+.divider {
+  display: flex;
+  justify-content: center;
+  color: var(--gold-deep);
+  opacity: .8;
+}
+
+/* ---------- О курсе ---------- */
+.about { text-align: center; }
+.about-text p {
+  color: var(--muted);
+  font-size: clamp(16.5px, 2.1vw, 19px);
+  margin-top: 18px;
+}
+.about-text p:first-child::first-letter {
+  font-size: 1.9em;
+  color: var(--gold-deep);
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* ---------- Блок 1 ---------- */
+.method-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 40px;
+}
+@media (max-width: 980px) { .method-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .method-grid { grid-template-columns: 1fr; } }
+.m-card {
+  background: rgba(255, 250, 235, .55);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 24px 22px;
+  position: relative;
+  transition: transform .35s cubic-bezier(.2,.7,.3,1), box-shadow .35s;
+}
+.m-card:hover { transform: translateY(-4px); box-shadow: 0 14px 30px -14px rgba(90, 60, 10, .35); }
+.m-card .idx {
+  font-size: 15px;
+  color: var(--paper0);
+  background: linear-gradient(135deg, var(--gold), var(--gold-deep));
+  border-radius: 3px;
+  width: 32px; height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+.m-card h3 { font-size: 18px; margin-bottom: 8px; }
+.m-card p { color: var(--muted); font-size: 14.5px; }
+
+/* ---------- Блок 2: развёрнутый свиток летописи ---------- */
+.journey { padding-bottom: 0; }
+.journey-head { text-align: center; margin-bottom: 56px; }
+.journey-head .section-desc { margin: 0 auto; }
+
+.trail {
+  position: relative;
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 74px clamp(20px, 6vw, 72px) 60px;
+  background:
+    radial-gradient(ellipse 7% 4% at 82% 12%, rgba(140, 95, 40, .12), transparent 100%),
+    radial-gradient(ellipse 9% 5% at 16% 78%, rgba(140, 95, 40, .1), transparent 100%),
+    linear-gradient(90deg,
+      rgba(120, 84, 34, .16) 0%, rgba(255, 250, 235, .5) 7%,
+      rgba(255, 250, 235, .65) 50%,
+      rgba(255, 250, 235, .5) 93%, rgba(120, 84, 34, .16) 100%);
+  box-shadow:
+    inset 0 24px 34px -26px rgba(90, 60, 10, .55),
+    inset 0 -24px 34px -26px rgba(90, 60, 10, .55),
+    0 30px 60px -30px rgba(90, 60, 10, .45);
+}
+/* валики свитка сверху и снизу */
+.trail::before, .trail::after {
+  content: "";
+  position: absolute;
+  left: -22px; right: -22px;
+  height: 30px;
+  border-radius: 15px;
+  background: linear-gradient(180deg, #D9BE8C 0%, #B08F52 45%, #7A5A24 100%);
+  box-shadow:
+    inset 0 3px 5px rgba(255, 245, 220, .55),
+    inset 0 -4px 6px rgba(60, 38, 8, .5),
+    0 10px 24px -8px rgba(60, 38, 8, .5);
+}
+.trail::before { top: -15px; }
+.trail::after { bottom: -15px; }
+
+.trail-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; z-index: 1; }
+#trailBase {
+  fill: none;
+  stroke: rgba(110, 78, 30, .22);
+  stroke-width: 1.4;
+  stroke-dasharray: 2 7;
+  stroke-linecap: round;
+}
+#trailGold {
+  fill: none;
+  stroke: var(--ink-soft);
+  stroke-width: 2;
+  stroke-linecap: round;
+  opacity: .85;
+}
+.comet {
+  position: absolute;
+  top: 0; left: 0; /* без top/left absolute считается от статической позиции — translate уезжает на padding свитка */
+  width: 8px; height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: var(--ink-soft);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Перо, пишущее летопись: остриё (8.5,68) в точке пути */
+.quill {
+  position: absolute;
+  top: 0; left: 0; /* остриё (8.5,68) точно в точке translate — от угла свитка */
+  z-index: 3;
+  width: 72px; height: 72px;
+  margin: -68px 0 0 -8.5px;
+  transform-origin: 12% 94%;
+  opacity: 0;
+  pointer-events: none;
+  filter: drop-shadow(3px 5px 4px rgba(60, 38, 8, .4));
+  will-change: transform;
+}
+.reduced .quill { display: none; }
+
+/* Мокрые чернила: тёмный блестящий след сразу за пером */
+#trailWet {
+  fill: none;
+  stroke: #241503;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  opacity: 0;
+}
+
+/* Росчерк под заголовком hero */
+.flourish {
+  display: block;
+  margin: 18px auto 0;
+  color: var(--gold-deep);
+}
+#flourishPath { stroke-dasharray: 400; stroke-dashoffset: 400; }
+.no-js #flourishPath, .reduced #flourishPath { stroke-dashoffset: 0; }
+
+/* Чернильная клякса при «пропечатывании» печати */
+.marker { position: relative; }
+.marker::after {
+  content: "";
+  position: absolute;
+  right: -9px; bottom: -7px;
+  width: 14px; height: 14px;
+  background: radial-gradient(circle at 40% 40%, var(--ink-soft) 0%, var(--ink-soft) 34%, transparent 36%),
+              radial-gradient(circle at 72% 66%, var(--ink-soft) 0%, var(--ink-soft) 16%, transparent 18%),
+              radial-gradient(circle at 24% 74%, var(--ink-soft) 0%, var(--ink-soft) 12%, transparent 14%);
+  opacity: 0;
+  transform: scale(0);
+  transition: transform .4s cubic-bezier(.2, 1.4, .4, 1), opacity .3s;
+}
+.stop.is-active .marker::after { opacity: .75; transform: scale(1); }
+
+/* Записи-главы идут по свитку одной колонкой */
+.stop {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  gap: 26px;
+  padding: clamp(34px, 5vh, 54px) 6px;
+}
+.stop + .stop::before {
+  /* орнамент-разделитель между главами */
+  content: "";
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+  width: 8px; height: 8px;
+  border: 1px solid rgba(140, 100, 32, .55);
+  background: rgba(184, 145, 44, .25);
+}
+
+.marker {
+  flex: none;
+  width: 50px; height: 50px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #E9CB74 0%, var(--gold) 45%, var(--gold-deep) 100%);
+  color: var(--paper0);
+  font-weight: 700;
+  font-size: 17px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    inset 0 0 0 3px rgba(246, 237, 216, .35),
+    inset 0 0 0 6px rgba(140, 100, 32, .4),
+    0 5px 14px -4px rgba(90, 60, 10, .5);
+}
+.stop.is-active .marker { animation: seal-pulse 2.6s infinite; }
+@keyframes seal-pulse {
+  0% { box-shadow: inset 0 0 0 3px rgba(246,237,216,.35), inset 0 0 0 6px rgba(140,100,32,.4), 0 0 0 0 rgba(184,145,44,.4); }
+  70% { box-shadow: inset 0 0 0 3px rgba(246,237,216,.35), inset 0 0 0 6px rgba(140,100,32,.4), 0 0 0 18px rgba(184,145,44,0); }
+  100% { box-shadow: inset 0 0 0 3px rgba(246,237,216,.35), inset 0 0 0 6px rgba(140,100,32,.4), 0 0 0 0 rgba(184,145,44,0); }
+}
+
+.stop-card h3 { margin-bottom: 6px; }
+.stop-card h3::first-letter { color: var(--gold-deep); font-size: 1.3em; font-weight: 700; }
+
+/* Рукописные заголовки: перо выводит буквы (hand-writer.js + hand-data.js) */
+.hand-title {
+  display: block;
+  height: 2.1em;
+  max-width: 100%;
+  overflow: visible;
+}
+.hand-title path {
+  stroke: currentColor;
+  fill: currentColor;
+  fill-opacity: 0;
+  stroke-width: 1.3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: color 2.2s ease .5s; /* высыхание свежих чернил до цвета текста */
+}
+.hand-title text {
+  font-size: 30px;
+  fill: currentColor;
+  opacity: 0;
+}
+.destination .hand-title { margin-inline: auto; }
+.stop-card p { color: var(--muted); font-size: 15.5px; max-width: 52ch; }
+.stop-card .stop-tag {
+  display: block;
+  font-size: 11px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+  margin-bottom: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.destination {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: clamp(46px, 7vh, 80px) 22px 20px;
+  max-width: 520px;
+  margin: 0 auto;
+}
+.dest-star { color: var(--gold-deep); margin-bottom: 16px; }
+.destination h3 { font-size: clamp(22px, 3.4vw, 30px); margin: 10px 0; }
+.dest-sub { color: var(--muted); font-style: italic; }
+
+/* ---------- Формат ---------- */
+.format .wrap { text-align: center; }
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  max-width: 720px;
+  margin: 42px auto 26px;
+}
+@media (max-width: 640px) { .stats { grid-template-columns: 1fr; } }
+.stat {
+  background: rgba(255, 250, 235, .55);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 28px 18px 22px;
+}
+.stat-num { font-size: clamp(40px, 6vw, 54px); color: var(--gold-deep); line-height: 1; }
+.stat-unit { font-size: 16px; margin-top: 4px; }
+.stat-note {
+  font-size: 13px; color: var(--muted); margin-top: 6px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.format-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  max-width: 760px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+.format-list li {
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-size: 14.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.format-list li::before {
+  content: "";
+  width: 6px; height: 6px;
+  transform: rotate(45deg);
+  background: var(--gold-deep);
+}
+
+/* ---------- Фишки ---------- */
+.features .wrap { text-align: center; }
+.feat-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  margin-top: 40px;
+}
+@media (max-width: 1020px) { .feat-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 640px) { .feat-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 440px) { .feat-grid { grid-template-columns: 1fr; } }
+.f-card {
+  background: rgba(255, 250, 235, .55);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 24px 18px;
+  transition: transform .35s cubic-bezier(.2,.7,.3,1), box-shadow .35s;
+}
+.f-card:hover { transform: translateY(-4px); box-shadow: 0 14px 30px -14px rgba(90, 60, 10, .35); }
+.f-card .ico { color: var(--gold-deep); margin-bottom: 12px; }
+.f-card h3 { font-size: 16.5px; margin-bottom: 6px; }
+.f-card p {
+  color: var(--muted); font-size: 13.5px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ---------- Кому подойдёт ---------- */
+.audience { text-align: center; }
+.aud-text { color: var(--muted); font-size: 17.5px; margin-top: 16px; }
+.kids-note {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  text-align: left;
+  background: rgba(255, 250, 235, .55);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 20px 22px;
+  margin-top: 28px;
+  color: var(--muted);
+  font-size: 15px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+.kids-note svg { flex: none; color: var(--gold-deep); margin-top: 2px; }
+
+/* ---------- Финал ---------- */
+.final { text-align: center; padding-bottom: 0; }
+.final-card {
+  position: relative;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: clamp(50px, 8vw, 80px) clamp(24px, 6vw, 70px);
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 250, 235, .45);
+}
+.final-card::after {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border: .5px solid var(--line);
+  border-radius: 5px;
+  pointer-events: none;
+}
+.final h2 { font-size: clamp(28px, 4.6vw, 44px); }
+.final h2 em { color: var(--gold-deep); }
+.final-sub { color: var(--muted); margin-top: 10px; font-style: italic; }
+.price-note {
+  color: var(--muted); font-size: 13.5px; margin-top: 18px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+.page-foot {
+  margin-top: clamp(70px, 10vh, 120px);
+  padding: 26px 20px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ---------- Свет свечи: тёплое дышащее пятно, следует за курсором ---------- */
+.candle {
+  position: fixed;
+  left: 0; top: 0;
+  width: 240vmax; height: 240vmax;
+  margin: -120vmax 0 0 -120vmax;
+  z-index: 4;
+  pointer-events: none;
+  background: radial-gradient(circle,
+    rgba(255, 216, 130, .10) 0%,
+    rgba(140, 95, 30, 0) 16%,
+    rgba(80, 52, 12, .16) 30%,
+    rgba(48, 30, 7, .32) 46%);
+  animation: candle-breathe 4.6s ease-in-out infinite;
+  will-change: transform;
+}
+@keyframes candle-breathe {
+  0%, 100% { opacity: .85; }
+  50% { opacity: 1; }
+}
+.reduced .candle { animation: none; }
+
+/* ---------- Мобильный свиток ---------- */
+@media (max-width: 720px) {
+  .trail::before, .trail::after { left: -8px; right: -8px; }
+  .stop { gap: 16px; }
+  .marker { width: 44px; height: 44px; font-size: 15px; }
+  .stop-card p { max-width: none; }
+  .corner.tr, .corner.bl { display: none; }
+}

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Лендинг курса «История Ислама» — выбор варианта</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌙</text></svg>">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh;
+    background: #12141F; color: #EDE9DC;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: flex; align-items: center; justify-content: center;
+    padding: 48px 20px;
+  }
+  .box { max-width: 1000px; width: 100%; }
+  .eyebrow { font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: #C9A227; font-weight: 600; }
+  h1 { font-family: Georgia, serif; font-size: clamp(26px, 4.4vw, 40px); margin: 10px 0 6px; line-height: 1.2; }
+  .sub { color: #9AA0B2; margin: 0 0 34px; max-width: 60ch; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+  a.card {
+    display: block; text-decoration: none; color: inherit;
+    border: 1px solid #2C3248; border-radius: 16px; overflow: hidden;
+    background: #181C2C;
+    transition: transform .3s cubic-bezier(.2,.7,.3,1), border-color .3s, box-shadow .3s;
+  }
+  a.card:hover { transform: translateY(-5px); border-color: #C9A227; box-shadow: 0 24px 50px -24px rgba(0,0,0,.7); }
+  .thumb { height: 150px; position: relative; overflow: hidden; }
+  .thumb.a { background: linear-gradient(180deg, #070B1A, #0D1430); }
+  .thumb.a::after {
+    content: ""; position: absolute; inset: 0;
+    background:
+      radial-gradient(1.5px 1.5px at 20% 30%, #EDE6D0 50%, transparent 51%),
+      radial-gradient(1px 1px at 70% 20%, #EDE6D0 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 45% 60%, #E8C766 50%, transparent 51%),
+      radial-gradient(1px 1px at 85% 70%, #EDE6D0 50%, transparent 51%),
+      radial-gradient(1px 1px at 10% 80%, #EDE6D0 50%, transparent 51%);
+  }
+  .thumb.a::before {
+    content: ""; position: absolute; left: 10%; right: 10%; top: 50%; height: 2px;
+    background: repeating-linear-gradient(90deg, #C9A227 0 4px, transparent 4px 12px);
+    transform: rotate(-8deg);
+  }
+  .thumb.b { background: linear-gradient(170deg, #F4E8CE, #E4CFA4); }
+  .thumb.b::before {
+    content: "И"; position: absolute; left: 26px; top: 32px;
+    width: 56px; height: 56px; border-radius: 4px;
+    background: linear-gradient(135deg, #B8912C, #8C6420); color: #F7EDD5;
+    font-family: Georgia, serif; font-size: 34px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .thumb.b::after {
+    content: ""; position: absolute; left: 100px; right: 24px; top: 52px; height: 40px;
+    background:
+      linear-gradient(#6E4E1E 0 0) 0 4px / 100% 2px no-repeat,
+      linear-gradient(#6E4E1E80 0 0) 0 20px / 82% 2px no-repeat,
+      linear-gradient(#6E4E1E80 0 0) 0 36px / 64% 2px no-repeat;
+  }
+  .thumb.c { background: #05060E; }
+  .thumb.c::before {
+    content: ""; position: absolute; inset: -40%;
+    background:
+      radial-gradient(ellipse 40% 32% at 32% 46%, rgba(96,60,180,.6), transparent 70%),
+      radial-gradient(ellipse 34% 26% at 66% 58%, rgba(30,110,160,.55), transparent 70%),
+      radial-gradient(ellipse 22% 18% at 52% 34%, rgba(200,140,60,.4), transparent 70%);
+    filter: blur(4px);
+  }
+  .thumb.c::after {
+    content: ""; position: absolute; inset: 0;
+    background:
+      radial-gradient(1.5px 1.5px at 30% 40%, #fff 50%, transparent 51%),
+      radial-gradient(1px 1px at 60% 25%, #fff 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 75% 65%, #E8C766 50%, transparent 51%);
+  }
+  .meta { padding: 16px 18px 18px; }
+  .meta .l { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: #C9A227; font-weight: 700; }
+  .meta h2 { font-family: Georgia, serif; font-size: 20px; margin: 6px 0 4px; font-weight: 600; }
+  .meta p { margin: 0; font-size: 13.5px; color: #9AA0B2; line-height: 1.5; }
+  footer { margin-top: 30px; font-size: 13px; color: #565D75; }
+  footer code { background: #181C2C; border: 1px solid #2C3248; border-radius: 6px; padding: 2px 8px; }
+</style>
+</head>
+<body>
+  <div class="box">
+    <span class="eyebrow">Внутренний предпросмотр · 3 варианта</span>
+    <h1>Лендинг курса «История Ислама:<br>от Адама до Мухаммада ﷺ»</h1>
+    <p class="sub">Один контент — три подачи. Открой каждый вариант, пройди скроллом до конца, потом выберем один.</p>
+    <div class="grid">
+      <a class="card" href="a-night-journey/">
+        <div class="thumb a"></div>
+        <div class="meta">
+          <span class="l">Вариант А</span>
+          <h2>Ночное путешествие</h2>
+          <p>Звёздное небо, золотая тропа времени, 11 тем — остановки маршрута.</p>
+        </div>
+      </a>
+      <a class="card" href="b-manuscript/">
+        <div class="thumb b"></div>
+        <div class="meta">
+          <span class="l">Вариант Б</span>
+          <h2>Манускрипт</h2>
+          <p>Светлая летопись: бумага, чернильная линия времени, золотые буквицы.</p>
+        </div>
+      </a>
+      <a class="card" href="c-universe/">
+        <div class="thumb c"></div>
+        <div class="meta">
+          <span class="l">Вариант В</span>
+          <h2>Сотворение вселенной</h2>
+          <p>Космос → Земля → карта земель пророков. Кинематографичный пролог.</p>
+        </div>
+      </a>
+    </div>
+    <footer>Запуск: <code>python3 -m http.server 8080</code> в корне проекта → <code>localhost:8080</code>. CTA и дата — в <code>shared/config.js</code>.</footer>
+  </div>
+</body>
+</html>
