@@ -19,12 +19,15 @@
   --grain: .05;
   --progress: linear-gradient(90deg, #6E4E1E, #B8912C);
 
+  /* Текстуры запечены из feTurbulence в WebP — tools/bake-textures.js.
+     Процедурный шум пересчитывался на CPU при каждой растеризации и подвешивал
+     Android и WebView Telegram. Правишь текстуру — перегенерируй скриптом. */
   /* Волокна кожи: мелкий монохромный шум, overlay */
-  --fiber: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23f)'/%3E%3C/svg%3E");
+  --fiber: url("tex/fiber.webp");
   /* Пятнистость выделки: крупный шум, multiply */
-  --mottle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='620' height='620'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.006 0.009' numOctaves='4' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='620' height='620' filter='url(%23m)'/%3E%3C/svg%3E");
+  --mottle: url("tex/mottle.webp");
   /* Волокна дуба: шум, растянутый по горизонтали */
-  --wood: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='720' height='720'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.004 0.05' numOctaves='4' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='720' height='720' filter='url(%23w)'/%3E%3C/svg%3E");
+  --wood: url("tex/wood.webp");
 }
 
 /* ============ Стол скриптория ============ */
@@ -121,7 +124,7 @@ main > * { position: relative; z-index: 1; }
   position: absolute;
   inset: 0;
   background-image: var(--fiber);
-  background-size: 240px;
+  background-size: 120px;
   opacity: .15;
   mix-blend-mode: overlay;
 }
