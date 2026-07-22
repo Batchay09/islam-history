@@ -1,71 +1,294 @@
-/* Вариант Б «Манускрипт» — бумага, чернила, золото */
+/* Вариант Б «Манускрипт» — лист пергамента на столе скриптория.
+   Материал: слои SVG-шума (волокна + пятнистость выделки), водяные разводы,
+   foxing, заломы, тёмная кромка. Предмет: тёмный дубовый стол, мягкая тень,
+   рваный край (clip-path из app.js), наклон «в руках». Без единой картинки. */
 
 :root {
-  --paper0: #F6EDD8;
-  --paper1: #EFE0BE;
-  --paper2: #E7D2A8;
-  --ink: #3B2A18;
-  --ink-soft: #6E4E1E;
-  --muted: #7A5E33;
+  --paper0: #F2E6C8;
+  --paper1: #EAD7AB;
+  --paper2: #D8BC86;
+  --ink: #2E2014;
+  --ink-soft: #5C4322;
+  --muted: #6E5530;
   --gold: #B8912C;
   --gold-deep: #8C6420;
-  --line: rgba(110, 78, 30, .35);
-}
+  --wax: #8C2F1E;
+  --line: rgba(110, 78, 30, .42);
 
-:root {
-  --vignette: rgba(70, 45, 10, .14); /* мягче: основное затемнение даёт свеча */
-  --grain: .07;
+  --vignette: rgba(30, 17, 4, .34);
+  --grain: .05;
   --progress: linear-gradient(90deg, #6E4E1E, #B8912C);
+
+  /* Волокна кожи: мелкий монохромный шум, overlay */
+  --fiber: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23f)'/%3E%3C/svg%3E");
+  /* Пятнистость выделки: крупный шум, multiply */
+  --mottle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='620' height='620'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.006 0.009' numOctaves='4' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='620' height='620' filter='url(%23m)'/%3E%3C/svg%3E");
+  /* Волокна дуба: шум, растянутый по горизонтали */
+  --wood: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='720' height='720'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.004 0.05' numOctaves='4' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='720' height='720' filter='url(%23w)'/%3E%3C/svg%3E");
 }
 
+/* ============ Стол скриптория ============ */
 body {
   color: var(--ink);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: "EB Garamond", Georgia, "Times New Roman", serif;
+  font-feature-settings: "onum" 1, "liga" 1;
+  font-size: 17.5px;
   background:
-    radial-gradient(ellipse 8% 5% at 78% 22%, rgba(150, 105, 45, .1), transparent 100%),
-    radial-gradient(ellipse 6% 4% at 12% 64%, rgba(150, 105, 45, .12), transparent 100%),
-    radial-gradient(ellipse 10% 6% at 55% 88%, rgba(150, 105, 45, .08), transparent 100%),
-    radial-gradient(ellipse at 15% 8%, rgba(210, 180, 120, .28), transparent 46%),
-    radial-gradient(ellipse at 88% 92%, rgba(190, 150, 90, .3), transparent 50%),
-    repeating-linear-gradient(2deg, rgba(160, 120, 60, .04) 0 3px, transparent 3px 7px),
-    linear-gradient(170deg, var(--paper0) 0%, var(--paper1) 55%, var(--paper2) 100%);
+    radial-gradient(90% 60% at 50% 18%, rgba(255, 202, 112, .09), transparent 60%),
+    radial-gradient(150% 120% at 50% 55%, transparent 38%, rgba(0, 0, 0, .5) 100%),
+    linear-gradient(168deg, #3A2410 0%, #2A1909 52%, #1C1106 100%);
+}
+body::before { /* волокна дерева на столе */
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: var(--wood);
+  background-size: 720px;
+  opacity: .28;
+  mix-blend-mode: overlay;
+  pointer-events: none;
 }
 
-/* лёгкая 3D-сцена: секции входят как перелистываемые страницы;
-   overflow-x: clip прячет расширение проекции при повороте */
-main { perspective: 1400px; overflow-x: clip; }
+/* ============ Лист пергамента ============ */
+.scene {
+  perspective: 1500px;
+}
+main {
+  position: relative;
+  width: min(1200px, 100% - clamp(18px, 4.5vw, 76px));
+  margin: clamp(20px, 4vh, 46px) auto clamp(30px, 6vh, 64px);
+  will-change: transform;
+}
+main > * { position: relative; z-index: 1; }
 
-.eyebrow.ink { color: var(--gold-deep); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+/* мягкая тень листа на столе */
+.sheet-shadow {
+  position: absolute;
+  inset: 20px -16px -26px;
+  z-index: 0;
+  background: rgba(12, 6, 1, .55);
+  border-radius: 14px;
+  filter: blur(30px);
+  pointer-events: none;
+}
 
-h1 { font-size: clamp(38px, 7.4vw, 86px); font-weight: 700; line-height: 1.08; }
+/* сама кожа: градиенты + разводы + foxing + заломы + кромка */
+.sheet-skin {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    /* световое пятно и неровная плотность */
+    radial-gradient(110% 26% at 34% 4%, rgba(255, 249, 231, .6), transparent 60%),
+    radial-gradient(70% 20% at 78% 46%, rgba(146, 96, 38, .1), transparent 70%),
+    radial-gradient(60% 16% at 18% 74%, rgba(146, 96, 38, .09), transparent 70%),
+    /* водяные разводы: пустая середина, тёмный ободок */
+    radial-gradient(ellipse 240px 150px at 82% 5%, transparent 56%, rgba(120, 80, 30, .2) 61%, rgba(120, 80, 30, .05) 65%, transparent 69%),
+    radial-gradient(ellipse 300px 190px at 8% 39%, transparent 58%, rgba(120, 80, 30, .16) 63%, rgba(120, 80, 30, .04) 67%, transparent 71%),
+    radial-gradient(ellipse 260px 170px at 92% 72%, transparent 57%, rgba(120, 80, 30, .18) 62%, transparent 68%),
+    /* foxing — рыжие точки времени */
+    radial-gradient(3px 3px at 12% 9%, rgba(122, 72, 22, .4), transparent 100%),
+    radial-gradient(2px 2px at 88% 14%, rgba(122, 72, 22, .34), transparent 100%),
+    radial-gradient(4px 3px at 26% 27%, rgba(122, 72, 22, .26), transparent 100%),
+    radial-gradient(2px 2px at 71% 33%, rgba(122, 72, 22, .38), transparent 100%),
+    radial-gradient(3px 3px at 6% 55%, rgba(122, 72, 22, .32), transparent 100%),
+    radial-gradient(2px 3px at 94% 49%, rgba(122, 72, 22, .3), transparent 100%),
+    radial-gradient(3px 2px at 43% 63%, rgba(122, 72, 22, .26), transparent 100%),
+    radial-gradient(2px 2px at 17% 81%, rgba(122, 72, 22, .36), transparent 100%),
+    radial-gradient(3px 3px at 82% 88%, rgba(122, 72, 22, .3), transparent 100%),
+    radial-gradient(2px 2px at 55% 95%, rgba(122, 72, 22, .34), transparent 100%),
+    /* заломы: тонкая пара свет/тень под углом (толщина в px, не в % высоты) */
+    linear-gradient(107deg, transparent calc(27% - 9px), rgba(255, 250, 232, .34) calc(27% - 2px), rgba(90, 60, 20, .14) calc(27% + 3px), transparent calc(27% + 12px)),
+    linear-gradient(84deg, transparent calc(56% - 9px), rgba(255, 250, 232, .28) calc(56% - 2px), rgba(90, 60, 20, .12) calc(56% + 3px), transparent calc(56% + 12px)),
+    linear-gradient(118deg, transparent calc(79% - 9px), rgba(255, 250, 232, .26) calc(79% - 2px), rgba(90, 60, 20, .12) calc(79% + 3px), transparent calc(79% + 12px)),
+    /* память свитка: едва заметные горизонтальные волны */
+    linear-gradient(180deg, transparent calc(21% - 20px), rgba(255, 250, 232, .2) 21%, rgba(90, 60, 20, .08) calc(21% + 12px), transparent calc(21% + 30px)),
+    linear-gradient(180deg, transparent calc(64% - 20px), rgba(255, 250, 232, .18) 64%, rgba(90, 60, 20, .07) calc(64% + 12px), transparent calc(64% + 30px)),
+    /* затемнение к краям листа */
+    linear-gradient(90deg, rgba(110, 74, 28, .16), transparent 36px),
+    linear-gradient(-90deg, rgba(110, 74, 28, .16), transparent 36px),
+    linear-gradient(180deg, rgba(110, 74, 28, .14), transparent 30px),
+    linear-gradient(0deg, rgba(110, 74, 28, .18), transparent 34px),
+    /* основа кожи */
+    linear-gradient(163deg, var(--paper0) 0%, var(--paper1) 48%, var(--paper2) 100%);
+  box-shadow:
+    inset 0 0 54px rgba(92, 58, 18, .3),
+    inset 0 0 10px rgba(92, 58, 18, .16);
+}
+.sheet-skin::before { /* волокна */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--fiber);
+  background-size: 240px;
+  opacity: .15;
+  mix-blend-mode: overlay;
+}
+.sheet-skin::after { /* пятнистость выделки */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--mottle);
+  background-size: 620px;
+  opacity: .16;
+  mix-blend-mode: multiply;
+}
+.no-js .sheet-skin { border-radius: 3px; }
+
+/* скользящий блик света — фиксирован в окне, поверх листа и стола */
+.sheet-gloss {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  background: radial-gradient(44% 36% at var(--mx, 50%) var(--my, 42%), rgba(255, 233, 172, .13), transparent 70%);
+  mix-blend-mode: soft-light;
+}
+
+/* тени больших пальцев — руки держат лист у краёв */
+.thumb {
+  position: fixed;
+  z-index: 4;
+  width: 96px;
+  height: 60px;
+  border-radius: 50%;
+  filter: blur(12px);
+  background: radial-gradient(closest-side, rgba(34, 18, 4, .38), rgba(34, 18, 4, .18) 55%, transparent 74%);
+  pointer-events: none;
+  opacity: 0;
+}
+.thumb-l {
+  left: calc(50% - min(600px, 50vw - clamp(9px, 2.2vw, 38px)));
+  top: 58vh;
+  transform: translateX(-46%) rotate(26deg);
+}
+.thumb-r {
+  right: calc(50% - min(600px, 50vw - clamp(9px, 2.2vw, 38px)));
+  top: 66vh;
+  transform: translateX(46%) rotate(-24deg);
+}
+.no-js .thumb, .reduced .thumb { opacity: .8; }
+
+/* пылинки в свете свечи */
+.dust { position: fixed; inset: 0; z-index: 4; pointer-events: none; }
+.dust i {
+  position: absolute;
+  top: 105vh;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(255, 226, 150, .4);
+  filter: blur(1px);
+  animation: dust-rise linear infinite;
+}
+.dust i:nth-child(1) { left: 9%;  animation-duration: 34s; animation-delay: -6s; }
+.dust i:nth-child(2) { left: 21%; animation-duration: 44s; animation-delay: -20s; width: 2px; height: 2px; }
+.dust i:nth-child(3) { left: 36%; animation-duration: 29s; animation-delay: -12s; }
+.dust i:nth-child(4) { left: 49%; animation-duration: 48s; animation-delay: -33s; width: 2px; height: 2px; }
+.dust i:nth-child(5) { left: 62%; animation-duration: 37s; animation-delay: -2s; }
+.dust i:nth-child(6) { left: 74%; animation-duration: 31s; animation-delay: -18s; width: 4px; height: 4px; }
+.dust i:nth-child(7) { left: 86%; animation-duration: 42s; animation-delay: -27s; }
+.dust i:nth-child(8) { left: 94%; animation-duration: 36s; animation-delay: -9s; width: 2px; height: 2px; }
+@keyframes dust-rise {
+  0%   { transform: translate(0, 0); opacity: 0; }
+  8%   { opacity: .55; }
+  52%  { transform: translate(26px, -58vh); opacity: .35; }
+  92%  { opacity: .1; }
+  100% { transform: translate(-14px, -118vh); opacity: 0; }
+}
+.reduced .dust, .no-js .dust { display: none; }
+
+/* ============ Типографика эпохи ============ */
+.eyebrow.ink {
+  color: var(--gold-deep);
+  font-family: inherit;
+  font-size: 13.5px;
+  letter-spacing: .3em;
+  font-weight: 600;
+}
+
+h1 { font-size: clamp(40px, 7.8vw, 92px); font-weight: 700; line-height: 1.05; }
 h1 em, h2 em { font-style: italic; color: var(--gold-deep); }
-h2 { font-size: clamp(25px, 4vw, 38px); margin: 12px 0 18px; }
-h3 { font-size: clamp(18px, 2.5vw, 23px); }
+h1 em { font-weight: 400; } /* курсив Garamond есть только в 400 — честное начертание вместо синтетики */
+h2 { font-size: clamp(27px, 4.2vw, 42px); margin: 12px 0 18px; font-weight: 600; }
+h3 { font-size: clamp(19px, 2.6vw, 25px); }
 
-.section-desc { color: var(--muted); max-width: 62ch; font-size: 17px; }
+.section-desc { color: var(--muted); max-width: 60ch; font-size: 18px; }
 
-section, .hero { padding: clamp(80px, 11vh, 140px) 0; }
+section, .hero { padding: clamp(78px, 11vh, 138px) 0; }
 
-/* ---------- Кнопки, чипы ---------- */
-.btn-ink {
-  background: var(--ink);
-  color: var(--paper0);
-  border-radius: 4px;
-  letter-spacing: .05em;
-  box-shadow: 0 6px 20px -6px rgba(59, 42, 24, .5);
+/* ---------- CTA: сургучная печать ---------- */
+.cta-seal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 136px;
+  height: 136px;
+  padding: 20px;
+  position: relative;
+  border-radius: 46% 54% 51% 49% / 53% 47% 55% 45%;
+  background:
+    radial-gradient(32% 30% at 34% 26%, rgba(255, 166, 124, .5), transparent 72%),
+    radial-gradient(92% 92% at 62% 70%, #5E1A0E, transparent 76%),
+    radial-gradient(120% 120% at 50% 40%, #A63A22, #8C2F1E 55%, #5E1C10);
+  box-shadow:
+    inset 0 3px 6px rgba(255, 190, 150, .34),
+    inset 0 -6px 10px rgba(40, 8, 2, .55),
+    0 12px 26px -8px rgba(0, 0, 0, .65);
+  color: #F8E4CC;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  text-decoration: none;
+  hyphens: none;
+  text-shadow: 0 -1px 0 rgba(60, 10, 2, .65), 0 1px 1px rgba(255, 190, 150, .28); /* тиснение в воске */
+  transition: transform .18s cubic-bezier(.3, .8, .4, 1), box-shadow .18s;
+  will-change: transform;
 }
-.btn-ink:hover { background: #59401F; }
+.cta-seal::before { /* внутренний обод оттиска */
+  content: "";
+  position: absolute;
+  inset: 11%;
+  border-radius: inherit;
+  border: 1.6px solid rgba(255, 200, 160, .4);
+  box-shadow: inset 0 2px 5px rgba(40, 8, 2, .5);
+  pointer-events: none;
+}
+.cta-seal:hover { transform: scale(.97); }
+.cta-seal:active {
+  transform: scale(.93);
+  box-shadow:
+    inset 0 5px 9px rgba(40, 8, 2, .7),
+    0 4px 10px -4px rgba(0, 0, 0, .6);
+}
+.cta-seal:focus-visible { outline: 2px solid var(--gold); outline-offset: 5px; }
 
+/* ---------- Дата старта: оттиск чернильного штампа ---------- */
 .date-chip {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 13.5px;
-  color: var(--muted);
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  padding: 10px 18px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 15px;
+  color: var(--ink-soft);
+  border: 1.6px solid rgba(92, 67, 34, .6);
+  border-radius: 3px 7px 4px 8px / 7px 3px 8px 4px;
+  padding: 10px 20px;
+  position: relative;
+  transform: rotate(-1.4deg);
+  letter-spacing: .04em;
+}
+.date-chip::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: .8px solid rgba(92, 67, 34, .4);
+  border-radius: inherit;
+  pointer-events: none;
 }
 .date-chip b { color: var(--ink); font-weight: 600; }
 
@@ -78,10 +301,10 @@ section, .hero { padding: clamp(80px, 11vh, 140px) 0; }
   opacity: .7;
   pointer-events: none;
 }
-.corner.tl { top: 22px; left: 22px; }
-.corner.tr { top: 22px; right: 22px; transform: rotate(90deg); }
-.corner.bl { bottom: 22px; left: 22px; transform: rotate(-90deg); }
-.corner.br { bottom: 22px; right: 22px; transform: rotate(180deg); }
+.corner.tl { top: 26px; left: 26px; }
+.corner.tr { top: 26px; right: 26px; transform: rotate(90deg); }
+.corner.bl { bottom: 26px; left: 26px; transform: rotate(-90deg); }
+.corner.br { bottom: 26px; right: 26px; transform: rotate(180deg); }
 
 /* ---------- Hero ---------- */
 .hero {
@@ -96,37 +319,60 @@ section, .hero { padding: clamp(80px, 11vh, 140px) 0; }
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
   margin-top: 18px;
   text-align: left;
 }
+/* Буквица: рукописный инициал в тонкой рамке, а не «иконка приложения» */
 .drop-cap {
   flex: none;
-  width: clamp(64px, 9vw, 92px);
-  height: clamp(64px, 9vw, 92px);
-  background: linear-gradient(135deg, var(--gold), var(--gold-deep));
-  color: var(--paper0);
-  font-size: clamp(40px, 6vw, 60px);
-  font-weight: 700;
+  width: clamp(66px, 9vw, 96px);
+  height: clamp(66px, 9vw, 96px);
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
-  box-shadow: inset 0 0 0 2px rgba(246, 237, 216, .4), 0 6px 18px -6px rgba(90, 60, 10, .55);
+  font-size: clamp(48px, 6.8vw, 72px);
+  font-weight: 700;
+  line-height: 1;
+  color: transparent;
+  background: linear-gradient(150deg, #D9B44A 10%, #8C6420 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  border: 1.2px solid rgba(140, 100, 32, .6);
+  border-radius: 2px;
   margin-top: 6px;
+}
+.drop-cap::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border: .8px solid rgba(140, 100, 32, .38);
+  pointer-events: none;
+}
+.drop-cap::after { /* точки-жемчужины по углам рамки */
+  content: "";
+  position: absolute;
+  inset: -3px;
+  background:
+    radial-gradient(circle 2.6px at 0 0, var(--gold-deep) 96%, transparent),
+    radial-gradient(circle 2.6px at 100% 0, var(--gold-deep) 96%, transparent),
+    radial-gradient(circle 2.6px at 0 100%, var(--gold-deep) 96%, transparent),
+    radial-gradient(circle 2.6px at 100% 100%, var(--gold-deep) 96%, transparent);
+  pointer-events: none;
 }
 .hero-lead {
   color: var(--muted);
-  font-size: clamp(16px, 2.2vw, 19px);
+  font-size: clamp(17px, 2.3vw, 21px);
   font-style: italic;
-  max-width: 54ch;
+  max-width: 52ch;
   margin: 24px auto 0;
 }
 .hero-cta {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
+  gap: 22px;
   flex-wrap: wrap;
   margin-top: 34px;
 }
@@ -139,10 +385,9 @@ section, .hero { padding: clamp(80px, 11vh, 140px) 0; }
   align-items: center;
   gap: 8px;
   color: var(--muted);
-  font-size: 11.5px;
-  letter-spacing: .22em;
+  font-size: 13px;
+  letter-spacing: .26em;
   text-transform: uppercase;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 .scroll-hint svg { animation: hint-bob 2s ease-in-out infinite; }
 @keyframes hint-bob {
@@ -162,48 +407,70 @@ section, .hero { padding: clamp(80px, 11vh, 140px) 0; }
 .about { text-align: center; }
 .about-text p {
   color: var(--muted);
-  font-size: clamp(16.5px, 2.1vw, 19px);
+  font-size: clamp(17px, 2.2vw, 20px);
   margin-top: 18px;
 }
 .about-text p:first-child::first-letter {
-  font-size: 1.9em;
+  font-size: 2em;
   color: var(--gold-deep);
   font-weight: 700;
   line-height: 1;
 }
 
-/* ---------- Блок 1 ---------- */
+/* ---------- Карточки → пометки писца ---------- */
 .method-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  gap: 18px;
   margin-top: 40px;
 }
 @media (max-width: 980px) { .method-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 560px) { .method-grid { grid-template-columns: 1fr; } }
-.m-card {
-  background: rgba(255, 250, 235, .55);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  padding: 24px 22px;
+
+.m-card, .f-card, .stat, .kids-note {
+  background: rgba(255, 250, 235, .32);
+  border: 1.3px solid rgba(110, 78, 30, .5);
+  border-radius: 7px 11px 8px 12px / 12px 8px 11px 7px;
   position: relative;
-  transition: transform .35s cubic-bezier(.2,.7,.3,1), box-shadow .35s;
+  transition: transform .45s cubic-bezier(.2, .7, .3, 1), border-color .45s, background-color .45s;
 }
-.m-card:hover { transform: translateY(-4px); box-shadow: 0 14px 30px -14px rgba(90, 60, 10, .35); }
-.m-card .idx {
+.m-card::before, .f-card::before, .stat::before, .kids-note::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border: .8px solid rgba(110, 78, 30, .3);
+  border-radius: 9px 7px 11px 8px / 7px 10px 8px 11px;
+  pointer-events: none;
+}
+.m-card:nth-child(odd), .f-card:nth-child(3n) { transform: rotate(-.4deg); }
+.m-card:nth-child(even), .f-card:nth-child(3n+1) { transform: rotate(.35deg); }
+.stat:nth-child(2) { transform: rotate(.3deg); }
+.stat:nth-child(3) { transform: rotate(-.35deg); }
+.m-card:hover, .f-card:hover {
+  transform: rotate(0deg);
+  border-color: rgba(110, 78, 30, .75);
+  background-color: rgba(255, 250, 235, .5);
+}
+
+.m-card { padding: 26px 22px; }
+.m-card .idx { /* мини-печать с номером */
   font-size: 15px;
   color: var(--paper0);
-  background: linear-gradient(135deg, var(--gold), var(--gold-deep));
-  border-radius: 3px;
-  width: 32px; height: 32px;
+  background: radial-gradient(circle at 35% 30%, #E9CB74, var(--gold) 52%, var(--gold-deep));
+  border-radius: 50%;
+  width: 34px; height: 34px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
   margin-bottom: 14px;
+  box-shadow:
+    inset 0 0 0 2px rgba(246, 237, 216, .35),
+    inset 0 0 0 4px rgba(140, 100, 32, .35),
+    0 3px 8px -3px rgba(90, 60, 10, .5);
 }
-.m-card h3 { font-size: 18px; margin-bottom: 8px; }
-.m-card p { color: var(--muted); font-size: 14.5px; }
+.m-card h3 { font-size: 19.5px; margin-bottom: 8px; }
+.m-card p { color: var(--muted); font-size: 15.5px; }
 
 /* ---------- Блок 2: развёрнутый свиток летописи ---------- */
 .journey { padding-bottom: 0; }
@@ -219,22 +486,28 @@ section, .hero { padding: clamp(80px, 11vh, 140px) 0; }
     radial-gradient(ellipse 7% 4% at 82% 12%, rgba(140, 95, 40, .12), transparent 100%),
     radial-gradient(ellipse 9% 5% at 16% 78%, rgba(140, 95, 40, .1), transparent 100%),
     linear-gradient(90deg,
-      rgba(120, 84, 34, .16) 0%, rgba(255, 250, 235, .5) 7%,
+      rgba(120, 84, 34, .18) 0%, rgba(255, 250, 235, .5) 7%,
       rgba(255, 250, 235, .65) 50%,
-      rgba(255, 250, 235, .5) 93%, rgba(120, 84, 34, .16) 100%);
+      rgba(255, 250, 235, .5) 93%, rgba(120, 84, 34, .18) 100%);
   box-shadow:
     inset 0 24px 34px -26px rgba(90, 60, 10, .55),
     inset 0 -24px 34px -26px rgba(90, 60, 10, .55),
-    0 30px 60px -30px rgba(90, 60, 10, .45);
+    0 34px 64px -30px rgba(50, 30, 6, .55);
 }
-/* валики свитка сверху и снизу */
+/* валики свитка; бегущий блик управляется --rollx из app.js */
 .trail::before, .trail::after {
   content: "";
   position: absolute;
   left: -22px; right: -22px;
   height: 30px;
   border-radius: 15px;
-  background: linear-gradient(180deg, #D9BE8C 0%, #B08F52 45%, #7A5A24 100%);
+  background:
+    repeating-linear-gradient(90deg,
+      rgba(255, 246, 220, 0) 0 34px,
+      rgba(255, 246, 220, .14) 40px 46px,
+      rgba(255, 246, 220, 0) 52px 86px),
+    linear-gradient(180deg, #D9BE8C 0%, #B08F52 45%, #7A5A24 100%);
+  background-position: var(--rollx, 0) 0, 0 0;
   box-shadow:
     inset 0 3px 5px rgba(255, 245, 220, .55),
     inset 0 -4px 6px rgba(60, 38, 8, .5),
@@ -260,7 +533,7 @@ section, .hero { padding: clamp(80px, 11vh, 140px) 0; }
 }
 .comet {
   position: absolute;
-  top: 0; left: 0; /* без top/left absolute считается от статической позиции — translate уезжает на padding свитка */
+  top: 0; left: 0; /* absolute без top/left считался бы от статики — translate уехал бы на padding */
   width: 8px; height: 8px;
   margin: -4px 0 0 -4px;
   border-radius: 50%;
@@ -272,7 +545,7 @@ section, .hero { padding: clamp(80px, 11vh, 140px) 0; }
 /* Перо, пишущее летопись: остриё (8.5,68) в точке пути */
 .quill {
   position: absolute;
-  top: 0; left: 0; /* остриё (8.5,68) точно в точке translate — от угла свитка */
+  top: 0; left: 0;
   z-index: 3;
   width: 72px; height: 72px;
   margin: -68px 0 0 -8.5px;
@@ -328,7 +601,6 @@ section, .hero { padding: clamp(80px, 11vh, 140px) 0; }
   padding: clamp(34px, 5vh, 54px) 6px;
 }
 .stop + .stop::before {
-  /* орнамент-разделитель между главами */
   content: "";
   position: absolute;
   top: 0; left: 50%;
@@ -345,7 +617,7 @@ section, .hero { padding: clamp(80px, 11vh, 140px) 0; }
   background: radial-gradient(circle at 35% 30%, #E9CB74 0%, var(--gold) 45%, var(--gold-deep) 100%);
   color: var(--paper0);
   font-weight: 700;
-  font-size: 17px;
+  font-size: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -386,15 +658,14 @@ section, .hero { padding: clamp(80px, 11vh, 140px) 0; }
   opacity: 0;
 }
 .destination .hand-title { margin-inline: auto; }
-.stop-card p { color: var(--muted); font-size: 15.5px; max-width: 52ch; }
+.stop-card p { color: var(--muted); font-size: 16.5px; max-width: 52ch; }
 .stop-card .stop-tag {
   display: block;
-  font-size: 11px;
-  letter-spacing: .2em;
+  font-size: 12.5px;
+  letter-spacing: .24em;
   text-transform: uppercase;
   color: var(--gold-deep);
   margin-bottom: 8px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 .destination {
@@ -406,7 +677,7 @@ section, .hero { padding: clamp(80px, 11vh, 140px) 0; }
   margin: 0 auto;
 }
 .dest-star { color: var(--gold-deep); margin-bottom: 16px; }
-.destination h3 { font-size: clamp(22px, 3.4vw, 30px); margin: 10px 0; }
+.destination h3 { font-size: clamp(23px, 3.5vw, 32px); margin: 10px 0; }
 .dest-sub { color: var(--muted); font-style: italic; }
 
 /* ---------- Формат ---------- */
@@ -414,23 +685,15 @@ section, .hero { padding: clamp(80px, 11vh, 140px) 0; }
 .stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: 18px;
   max-width: 720px;
   margin: 42px auto 26px;
 }
 @media (max-width: 640px) { .stats { grid-template-columns: 1fr; } }
-.stat {
-  background: rgba(255, 250, 235, .55);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  padding: 28px 18px 22px;
-}
-.stat-num { font-size: clamp(40px, 6vw, 54px); color: var(--gold-deep); line-height: 1; }
-.stat-unit { font-size: 16px; margin-top: 4px; }
-.stat-note {
-  font-size: 13px; color: var(--muted); margin-top: 6px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-}
+.stat { padding: 28px 18px 22px; }
+.stat-num { font-size: clamp(42px, 6.2vw, 58px); color: var(--gold-deep); line-height: 1; }
+.stat-unit { font-size: 17px; margin-top: 4px; }
+.stat-note { font-size: 14.5px; color: var(--muted); margin-top: 6px; font-style: italic; }
 
 .format-list {
   list-style: none;
@@ -441,16 +704,15 @@ section, .hero { padding: clamp(80px, 11vh, 140px) 0; }
   justify-content: center;
   gap: 10px;
   max-width: 760px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 .format-list li {
-  border: 1px solid var(--line);
-  border-radius: 4px;
+  border: 1.2px solid rgba(110, 78, 30, .5);
+  border-radius: 3px 6px 4px 7px / 6px 3px 7px 4px;
   padding: 10px 20px;
-  font-size: 14.5px;
+  font-size: 15.5px;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
 }
 .format-list li::before {
   content: "";
@@ -458,49 +720,37 @@ section, .hero { padding: clamp(80px, 11vh, 140px) 0; }
   transform: rotate(45deg);
   background: var(--gold-deep);
 }
+.format-list li:nth-child(odd) { transform: rotate(-.3deg); }
+.format-list li:nth-child(even) { transform: rotate(.3deg); }
 
 /* ---------- Фишки ---------- */
 .features .wrap { text-align: center; }
 .feat-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 14px;
+  gap: 16px;
   margin-top: 40px;
 }
 @media (max-width: 1020px) { .feat-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 640px) { .feat-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 440px) { .feat-grid { grid-template-columns: 1fr; } }
-.f-card {
-  background: rgba(255, 250, 235, .55);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  padding: 24px 18px;
-  transition: transform .35s cubic-bezier(.2,.7,.3,1), box-shadow .35s;
-}
-.f-card:hover { transform: translateY(-4px); box-shadow: 0 14px 30px -14px rgba(90, 60, 10, .35); }
+.f-card { padding: 24px 18px; }
 .f-card .ico { color: var(--gold-deep); margin-bottom: 12px; }
-.f-card h3 { font-size: 16.5px; margin-bottom: 6px; }
-.f-card p {
-  color: var(--muted); font-size: 13.5px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-}
+.f-card h3 { font-size: 17.5px; margin-bottom: 6px; }
+.f-card p { color: var(--muted); font-size: 14.5px; }
 
 /* ---------- Кому подойдёт ---------- */
 .audience { text-align: center; }
-.aud-text { color: var(--muted); font-size: 17.5px; margin-top: 16px; }
+.aud-text { color: var(--muted); font-size: 18.5px; margin-top: 16px; }
 .kids-note {
   display: flex;
   gap: 14px;
   align-items: flex-start;
   text-align: left;
-  background: rgba(255, 250, 235, .55);
-  border: 1px solid var(--line);
-  border-radius: 6px;
   padding: 20px 22px;
   margin-top: 28px;
   color: var(--muted);
-  font-size: 15px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 16px;
 }
 .kids-note svg { flex: none; color: var(--gold-deep); margin-top: 2px; }
 
@@ -512,32 +762,29 @@ section, .hero { padding: clamp(80px, 11vh, 140px) 0; }
   margin: 0 auto;
   padding: clamp(50px, 8vw, 80px) clamp(24px, 6vw, 70px);
   border: 1.5px solid var(--line);
-  border-radius: 8px;
-  background: rgba(255, 250, 235, .45);
+  border-radius: 8px 13px 9px 14px / 14px 9px 13px 8px;
+  background: rgba(255, 250, 235, .38);
 }
 .final-card::after {
   content: "";
   position: absolute;
   inset: 7px;
-  border: .5px solid var(--line);
-  border-radius: 5px;
+  border: .8px solid rgba(110, 78, 30, .35);
+  border-radius: 10px 7px 12px 8px / 8px 11px 7px 12px;
   pointer-events: none;
 }
-.final h2 { font-size: clamp(28px, 4.6vw, 44px); }
+.final h2 { font-size: clamp(30px, 4.8vw, 48px); }
 .final h2 em { color: var(--gold-deep); }
 .final-sub { color: var(--muted); margin-top: 10px; font-style: italic; }
-.price-note {
-  color: var(--muted); font-size: 13.5px; margin-top: 18px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-}
+.price-note { color: var(--muted); font-size: 15px; margin-top: 20px; }
 .page-foot {
   margin-top: clamp(70px, 10vh, 120px);
-  padding: 26px 20px;
+  padding: 26px 20px 34px;
   border-top: 1px solid var(--line);
   color: var(--muted);
-  font-size: 13px;
+  font-size: 14.5px;
   text-align: center;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-style: italic;
 }
 
 /* ---------- Свет свечи: тёплое дышащее пятно, следует за курсором ---------- */
@@ -549,24 +796,34 @@ section, .hero { padding: clamp(80px, 11vh, 140px) 0; }
   z-index: 4;
   pointer-events: none;
   background: radial-gradient(circle,
-    rgba(255, 216, 130, .10) 0%,
-    rgba(140, 95, 30, 0) 16%,
-    rgba(80, 52, 12, .16) 30%,
-    rgba(48, 30, 7, .32) 46%);
+    rgba(255, 214, 124, .12) 0%,
+    rgba(140, 95, 30, 0) 15%,
+    rgba(70, 44, 10, .18) 30%,
+    rgba(34, 20, 5, .38) 47%);
   animation: candle-breathe 4.6s ease-in-out infinite;
   will-change: transform;
 }
-@keyframes candle-breathe {
+@keyframes candle-breathe { /* дыхание + едва заметное дрожание пламени */
   0%, 100% { opacity: .85; }
-  50% { opacity: 1; }
+  18% { opacity: .97; }
+  33% { opacity: .88; }
+  52% { opacity: 1; }
+  71% { opacity: .9; }
+  86% { opacity: .98; }
 }
 .reduced .candle { animation: none; }
 
-/* ---------- Мобильный свиток ---------- */
+/* ---------- Мобильный лист ---------- */
 @media (max-width: 720px) {
+  main { width: calc(100% - 18px); margin-top: 12px; }
+  .sheet-shadow { inset: 12px -8px -14px; filter: blur(18px); }
+  .thumb { width: 64px; height: 40px; }
+  .thumb-l { left: 0; transform: translateX(-40%) rotate(26deg); }
+  .thumb-r { right: 0; transform: translateX(40%) rotate(-24deg); }
   .trail::before, .trail::after { left: -8px; right: -8px; }
   .stop { gap: 16px; }
-  .marker { width: 44px; height: 44px; font-size: 15px; }
+  .marker { width: 44px; height: 44px; font-size: 16px; }
   .stop-card p { max-width: none; }
   .corner.tr, .corner.bl { display: none; }
+  .cta-seal { width: 124px; height: 124px; font-size: 13.5px; }
 }

@@ -9,8 +9,11 @@
 <meta property="og:description" content="Увидеть историю Ислама единой цельной картиной. Онлайн-курс: 3 месяца · 24 занятия · Zoom.">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📜</text></svg>">
-<link rel="stylesheet" href="../shared/base.css?v=7">
-<link rel="stylesheet" href="style.css?v=7">
+<link rel="preload" href="../vendor/fonts/eb-garamond-var-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../vendor/fonts/eb-garamond-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../vendor/fonts/eb-garamond.css?v=8">
+<link rel="stylesheet" href="../shared/base.css?v=8">
+<link rel="stylesheet" href="style.css?v=8">
 </head>
 <body>
 <script>document.documentElement.classList.remove('no-js')</script>
@@ -19,8 +22,15 @@
 <div class="fx-vignette" aria-hidden="true"></div>
 <div class="fx-grain" aria-hidden="true"></div>
 <div class="progress" aria-hidden="true"></div>
+<div class="sheet-gloss" aria-hidden="true"></div>
+<div class="thumb thumb-l" aria-hidden="true"></div>
+<div class="thumb thumb-r" aria-hidden="true"></div>
+<div class="dust" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
 
-<main>
+<div class="scene">
+<main id="sheet">
+  <div class="sheet-shadow" aria-hidden="true"></div>
+  <div class="sheet-skin" id="sheetSkin" aria-hidden="true"></div>
   <!-- ============ HERO ============ -->
   <header class="hero">
     <svg class="corner tl" viewBox="0 0 60 60" aria-hidden="true"><path d="M2 58 C2 20 20 2 58 2 M2 40 C2 14 14 2 40 2 M10 58 C10 30 30 10 58 10" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="14" cy="14" r="3" fill="currentColor"/></svg>
@@ -37,7 +47,7 @@
       <svg class="flourish" viewBox="0 0 240 24" width="240" height="24" aria-hidden="true"><path id="flourishPath" d="M4 14 C 60 4, 90 22, 120 12 C 150 2, 180 20, 236 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
       <p class="hero-lead" data-reveal>Курс, который даст увидеть историю Ислама единой цельной картиной — от сотворения мира до рождения Пророка ﷺ.</p>
       <div class="hero-cta" data-reveal>
-        <a class="btn btn-ink" data-cta href="#">Записаться на курс</a>
+        <a class="cta-seal" data-cta href="#">Записаться на курс</a>
         <span class="date-chip" data-start-chip></span>
       </div>
     </div>
@@ -155,7 +165,7 @@
       <h2 data-reveal id="finalTitle"></h2>
       <p class="final-sub" data-reveal id="finalSub"></p>
       <div class="hero-cta" data-reveal>
-        <a class="btn btn-ink" data-cta href="#">Записаться на курс</a>
+        <a class="cta-seal" data-cta href="#">Записаться на курс</a>
         <span class="date-chip" data-start-chip></span>
       </div>
       <p class="price-note" data-reveal id="priceNote"></p>
@@ -163,16 +173,17 @@
     <footer class="page-foot">Курс по истории Ислама · первый поток · 2026</footer>
   </section>
 </main>
+</div>
 
-<script src="../vendor/gsap.min.js?v=7"></script>
-<script src="../vendor/ScrollTrigger.min.js?v=7"></script>
-<script src="../vendor/lenis.min.js?v=7"></script>
-<script src="../shared/config.js?v=7"></script>
-<script src="../shared/content.js?v=7"></script>
-<script src="../shared/render.js?v=7"></script>
-<script src="../shared/fx.js?v=7"></script>
-<script src="hand-data.js?v=7"></script>
-<script src="hand-writer.js?v=7"></script>
-<script src="app.js?v=7"></script>
+<script src="../vendor/gsap.min.js?v=8"></script>
+<script src="../vendor/ScrollTrigger.min.js?v=8"></script>
+<script src="../vendor/lenis.min.js?v=8"></script>
+<script src="../shared/config.js?v=8"></script>
+<script src="../shared/content.js?v=8"></script>
+<script src="../shared/render.js?v=8"></script>
+<script src="../shared/fx.js?v=8"></script>
+<script src="hand-data.js?v=8"></script>
+<script src="hand-writer.js?v=8"></script>
+<script src="app.js?v=8"></script>
 </body>
 </html>

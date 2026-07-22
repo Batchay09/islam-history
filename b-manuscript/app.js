@@ -1,9 +1,10 @@
 /**
- * Вариант Б «Манускрипт»: язык движения — «перо пишет летопись».
- * Буквица пропечатывается, заголовок пишется по буквам, росчерк
- * прорисовывается; заголовки секций «выписываются» слева направо;
- * линию летописи ведёт перо, наклоняющееся по ходу письма;
- * секции входят как перелистываемые страницы.
+ * Вариант Б «Манускрипт»: лист пергамента на столе скриптория.
+ * Язык движения — «перо пишет летопись»: буквица пропечатывается,
+ * заголовок пишется по буквам, росчерк прорисовывается, разделители
+ * рисуются, печати пропечатываются. Сам лист — физический предмет:
+ * опускается на стол при загрузке, наклоняется за курсором/гироскопом
+ * («держу в руках»), прогибается при скролле; край листа рваный.
  */
 (function () {
   'use strict';
@@ -17,28 +18,146 @@
   if (!window.gsap) { document.documentElement.classList.add('reduced'); return; }
   gsap.registerPlugin(ScrollTrigger);
 
+  var sheet = document.getElementById('sheet');
+  var scene = document.querySelector('.scene');
+  var skin = document.getElementById('sheetSkin');
+  var gloss = document.querySelector('.sheet-gloss');
+
+  /* ---------- Наклон листа «в руках» + прогиб при скролле ---------- */
+  var tilt = { rx: 0, ry: 0, txr: 0, tyr: 0, bend: 0, bendT: 0, ready: false };
+
+  var lenis = null;
   if (!reduced && window.Lenis) {
-    var lenis = new Lenis({ lerp: .08 }); // неторопливый «книжный» скролл
-    lenis.on('scroll', ScrollTrigger.update);
+    lenis = new Lenis({ lerp: .08 }); // неторопливый «книжный» скролл
+    lenis.on('scroll', function (e) {
+      ScrollTrigger.update();
+      // лист едва прогибается от скорости прокрутки, затем распрямляется
+      if (e && typeof e.velocity === 'number') {
+        tilt.bendT = Math.max(-1.3, Math.min(1.3, -e.velocity * .035));
+      }
+    });
     gsap.ticker.add(function (t) { lenis.raf(t * 1000); });
     gsap.ticker.lagSmoothing(0);
   }
 
-  /* ---------- Титры hero: печать буквицы → письмо → росчерк ---------- */
+  /* ---------- Рваный край листа: полигон с «укусами» внутрь ---------- */
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      var t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  function roughEdges() {
+    if (!skin) return;
+    var w = skin.clientWidth, h = skin.clientHeight;
+    if (!w || !h) return;
+    var rnd = mulberry32(7);
+    var pts = [];
+    function edge(x0, y0, x1, y1, step) {
+      var dx = x1 - x0, dy = y1 - y0;
+      var len = Math.sqrt(dx * dx + dy * dy);
+      var n = Math.max(2, Math.round(len / step));
+      // нормаль внутрь листа (обход по часовой): (-dy, dx) / len
+      var nx = -dy / len, ny = dx / len;
+      for (var i = 0; i < n; i++) {
+        var t = i / n;
+        var deep = rnd() < .07 ? 6 + rnd() * 9 : 0; // редкий глубокий «укус»
+        var a = rnd() * 4.5 + deep;
+        pts.push([
+          x0 + dx * t + nx * a,
+          y0 + dy * t + ny * a
+        ]);
+      }
+    }
+    edge(0, 0, w, 0, 26);   // верх
+    edge(w, 0, w, h, 120);  // право
+    edge(w, h, 0, h, 26);   // низ
+    edge(0, h, 0, 0, 120);  // лево
+    skin.style.clipPath = 'polygon(' + pts.map(function (p) {
+      return p[0].toFixed(1) + 'px ' + p[1].toFixed(1) + 'px';
+    }).join(',') + ')';
+  }
+
+  function applySheet() {
+    var oy = scrollY + innerHeight / 2 - sheet.offsetTop;
+    sheet.style.transformOrigin = '50% ' + oy.toFixed(0) + 'px';
+    scene.style.perspectiveOrigin = '50% ' + (scrollY + innerHeight / 2).toFixed(0) + 'px';
+    sheet.style.transform =
+      'rotateX(' + (tilt.ry + tilt.bend).toFixed(3) + 'deg) rotateY(' + tilt.rx.toFixed(3) + 'deg)';
+  }
+
+  if (!reduced) {
+    gsap.ticker.add(function () {
+      tilt.rx += (tilt.txr - tilt.rx) * .06;
+      tilt.ry += (tilt.tyr - tilt.ry) * .06;
+      tilt.bend += (tilt.bendT - tilt.bend) * .1;
+      tilt.bendT *= .92;
+      if (tilt.ready) applySheet();
+    });
+
+    // курсор — на устройствах с мышью
+    if (matchMedia('(hover:hover) and (pointer:fine)').matches) {
+      addEventListener('mousemove', function (e) {
+        var px = e.clientX / innerWidth - .5;
+        var py = e.clientY / innerHeight - .5;
+        tilt.txr = px * 2.4;
+        tilt.tyr = -py * 1.7;
+        if (gloss) {
+          gloss.style.setProperty('--mx', (50 + px * 42).toFixed(1) + '%');
+          gloss.style.setProperty('--my', (50 + py * 42).toFixed(1) + '%');
+        }
+      }, { passive: true });
+    }
+
+    // гироскоп — там, где события приходят без запроса разрешения (Android)
+    if (matchMedia('(hover:none)').matches && 'DeviceOrientationEvent' in window &&
+        typeof DeviceOrientationEvent.requestPermission !== 'function') {
+      var beta0 = null;
+      addEventListener('deviceorientation', function (e) {
+        if (e.gamma == null || e.beta == null) return;
+        if (beta0 == null) beta0 = e.beta;
+        tilt.txr = Math.max(-2.2, Math.min(2.2, e.gamma / 14));
+        tilt.tyr = Math.max(-1.6, Math.min(1.6, (beta0 - e.beta) / 16));
+      }, { passive: true });
+    }
+  }
+
+  /* ---------- Лист опускается на стол ---------- */
+  if (!reduced) {
+    // точка схода перспективы — в центре первого экрана, а не в середине страницы
+    scene.style.perspectiveOrigin = '50% ' + Math.round(innerHeight / 2) + 'px';
+    gsap.fromTo(sheet,
+      { y: -34, rotationX: 6, scale: 1.015, transformOrigin: '50% 10%', opacity: 0 },
+      {
+        y: 0, rotationX: 0, scale: 1, opacity: 1, duration: 1.15, ease: 'power3.out',
+        onComplete: function () {
+          gsap.set(sheet, { clearProps: 'transform,transformOrigin,opacity' });
+          tilt.ready = true;
+        }
+      });
+    gsap.fromTo('.sheet-shadow',
+      { opacity: .2 }, { opacity: 1, duration: 1.15, ease: 'power3.out' });
+    gsap.to('.thumb', { opacity: 1, duration: .9, delay: .8, stagger: .15 });
+  }
+
+  /* ---------- Титры hero: печать буквицы → письмо → росчерк → печать ---------- */
   if (!reduced) {
     var h1 = document.querySelector('.hero h1');
     var chars = window.FX ? FX.splitChars(h1) : [];
     gsap.set(chars, { opacity: 0 });
-    gsap.timeline({ defaults: { ease: 'power2.out' } })
+    gsap.timeline({ defaults: { ease: 'power2.out' }, delay: .55 })
       .fromTo('.hero .eyebrow', { opacity: 0, filter: 'blur(3px)' }, { opacity: 1, filter: 'blur(0px)', duration: .9 }, .1)
-      // буквица «пропечатывается» в бумагу
+      // буквица «пропечатывается» в кожу
       .fromTo('.drop-cap',
         { opacity: 0, scale: 1.6, rotate: -7 },
         { opacity: 1, scale: 1, rotate: 0, duration: .5, ease: 'power3.in' }, .5)
       .to('.drop-cap', { scale: .965, duration: .1, ease: 'power1.out' }, 1)
       .to('.drop-cap', { scale: 1, duration: .25, ease: 'back.out(3)' }, 1.1)
       .set('.cap-title', { opacity: 1 }, .5)
-      // заголовок пишется по буквам, с лёгким «чернильным» размытием
+      // заголовок пишется по буквам
       .to(chars, {
         opacity: 1, duration: .3, stagger: .022,
         onStart: function () { h1.style.opacity = 1; }
@@ -46,8 +165,15 @@
       // росчерк пера под заголовком
       .to('#flourishPath', { strokeDashoffset: 0, duration: 1.1, ease: 'power2.inOut' }, 2.3)
       .fromTo('.hero-lead', { opacity: 0, filter: 'blur(4px)' }, { opacity: 1, filter: 'blur(0px)', duration: 1 }, 2.7)
-      .fromTo('.hero .hero-cta', { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: .9 }, 3)
-      .fromTo('.scroll-hint', { opacity: 0 }, { opacity: 1, duration: .9 }, 3.4);
+      // сургучная печать шлёпается в лист
+      .set('.hero .hero-cta', { opacity: 1 }, 2.95)
+      .fromTo('.hero .cta-seal',
+        { opacity: 0, scale: 1.7, rotate: -8 },
+        { opacity: 1, scale: 1, rotate: 0, duration: .38, ease: 'power3.in' }, 3)
+      .to('.hero .cta-seal', { scale: .94, duration: .09, ease: 'power1.out' }, 3.38)
+      .to('.hero .cta-seal', { scale: 1, duration: .3, ease: 'back.out(2.6)' }, 3.47)
+      .fromTo('.hero .date-chip', { opacity: 0, filter: 'blur(4px)' }, { opacity: 1, filter: 'blur(0px)', duration: .8 }, 3.5)
+      .fromTo('.scroll-hint', { opacity: 0 }, { opacity: 1, duration: .9 }, 3.9);
 
     gsap.to('.hero-inner', {
       yPercent: -10, opacity: 0, ease: 'none',
@@ -55,7 +181,7 @@
     });
   }
 
-  /* ---------- Reveal: заголовки «выписываются», текст проступает ---------- */
+  /* ---------- Появления: только «чернила проступают», ничего не выезжает ---------- */
   if (!reduced) {
     document.querySelectorAll('[data-reveal]').forEach(function (node) {
       if (node.closest('.hero')) return;
@@ -68,31 +194,63 @@
             scrollTrigger: { trigger: node, start: 'top 86%', once: true }
           });
       } else {
-        // чернила проступают на бумаге
+        // чернила впитываются в кожу; сетки — с лёгкой очерёдностью письма
+        var delay = 0;
+        if (node.matches('.m-card, .f-card, .stat, .format-list li')) {
+          delay = Array.prototype.indexOf.call(node.parentElement.children, node) * .08;
+        }
         gsap.fromTo(node,
-          { opacity: 0, y: 14, filter: 'blur(5px)' },
+          { opacity: 0, filter: 'blur(6px)' },
           {
-            opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.25, ease: 'power2.out',
+            opacity: 1, filter: 'blur(0px)', duration: 1.2, delay: delay, ease: 'power2.out',
             scrollTrigger: { trigger: node, start: 'top 88%', once: true }
           });
       }
     });
 
-    // секции — перелистываемые страницы (кроме hero и журнала с пером)
-    document.querySelectorAll('.about, .method, .format, .features, .audience, .final').forEach(function (sec) {
-      gsap.fromTo(sec,
-        { rotationX: 5, y: 44, transformOrigin: 'center top' },
+    // мини-печати с номерами пропечатываются в карточки
+    document.querySelectorAll('.m-card .idx').forEach(function (idx) {
+      gsap.fromTo(idx,
+        { scale: 1.8, opacity: 0, rotate: -10 },
         {
-          rotationX: 0, y: 0, duration: 1.4, ease: 'power3.out',
-          scrollTrigger: { trigger: sec, start: 'top 84%', once: true }
+          scale: 1, opacity: 1, rotate: 0, duration: .45, ease: 'power3.in',
+          scrollTrigger: { trigger: idx.closest('.m-card'), start: 'top 86%', once: true }
         });
     });
 
+    // разделители-орнаменты прорисовываются пером
+    document.querySelectorAll('.divider').forEach(function (div) {
+      var paths = div.querySelectorAll('path');
+      paths.forEach(function (p) {
+        var L = p.getTotalLength();
+        p.style.strokeDasharray = L;
+        p.style.strokeDashoffset = L;
+      });
+      var dot = div.querySelector('circle');
+      var tl = gsap.timeline({
+        scrollTrigger: { trigger: div, start: 'top 92%', once: true }
+      });
+      tl.to(paths, { strokeDashoffset: 0, duration: .9, ease: 'power2.inOut', stagger: .18 });
+      if (dot) tl.fromTo(dot, { attr: { r: 0 } }, { attr: { r: 1.6 }, duration: .3, ease: 'back.out(3)' }, '-=.2');
+    });
+
+    // печать финального CTA пропечатывается
+    document.querySelectorAll('.final .cta-seal').forEach(function (seal) {
+      gsap.timeline({
+        scrollTrigger: { trigger: seal, start: 'top 88%', once: true }
+      })
+        .fromTo(seal, { opacity: 0, scale: 1.7, rotate: -8 },
+          { opacity: 1, scale: 1, rotate: 0, duration: .38, ease: 'power3.in' })
+        .to(seal, { scale: .94, duration: .09, ease: 'power1.out' })
+        .to(seal, { scale: 1, duration: .3, ease: 'back.out(2.6)' });
+    });
+
+    // главы летописи
     document.querySelectorAll('.stop').forEach(function (stop) {
       gsap.fromTo(stop.querySelector('.stop-card'),
-        { opacity: 0, y: 18, filter: 'blur(5px)' },
+        { opacity: 0, filter: 'blur(5px)' },
         {
-          opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.2, ease: 'power2.out',
+          opacity: 1, filter: 'blur(0px)', duration: 1.2, ease: 'power2.out',
           scrollTrigger: { trigger: stop, start: 'top 78%', once: true }
         });
       gsap.fromTo(stop.querySelector('.marker'),
@@ -106,6 +264,17 @@
         onToggle: function (self) { stop.classList.toggle('is-active', self.isActive); }
       });
     });
+
+    // звезда финала летописи пропечатывается
+    var star = document.querySelector('.dest-star');
+    if (star) {
+      gsap.fromTo(star,
+        { scale: 1.6, opacity: 0, rotate: -12 },
+        {
+          scale: 1, opacity: 1, rotate: 0, duration: .5, ease: 'power3.in',
+          scrollTrigger: { trigger: '.destination', start: 'top 80%', once: true }
+        });
+    }
   } else {
     document.querySelectorAll('.stop-card, .marker').forEach(function (n) { n.style.opacity = 1; });
   }
@@ -183,7 +352,7 @@
         var ahead = inkPath.getPointAtLength(Math.min(len, s + 2));
         var angle = Math.atan2(ahead.y - p.y, ahead.x - p.x) * 180 / Math.PI;
         var visible = prog > 0 && prog < 1 ? 1 : 0;
-        // живое письмо: перо покачивается и чуть «скребёт» бумагу
+        // живое письмо: перо покачивается и чуть «скребёт» кожу
         var wobble = Math.sin(s * .16) * 3.4 + Math.sin(s * .53) * 1.6;
         var press = Math.abs(Math.sin(s * .09)) * 1.6;
         // актуальная точка линии — сюда перо возвращается после письма заголовков
@@ -198,6 +367,8 @@
         wetPath.style.opacity = visible * .8;
         drop.style.transform = 'translate(' + p.x + 'px,' + p.y + 'px)';
         drop.style.opacity = visible;
+        // блики на валиках: свиток «прокручивается» по мере письма
+        trail.style.setProperty('--rollx', (prog * 160).toFixed(1) + 'px');
       }
     });
   }
@@ -206,8 +377,17 @@
   // чтобы buildTrail считал уже финальную вёрстку
   if (window.HandWriter) HandWriter.init();
 
+  roughEdges();
   buildTrail();
-  ScrollTrigger.addEventListener('refreshInit', buildTrail);
+  ScrollTrigger.addEventListener('refreshInit', function () {
+    roughEdges();
+    buildTrail();
+  });
+
+  // шрифт EB Garamond подгружается со свопом — после него метрики другие
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(function () { ScrollTrigger.refresh(); });
+  }
 
   /* ---------- Свеча следует за курсором ---------- */
   var candle = document.querySelector('.candle');
