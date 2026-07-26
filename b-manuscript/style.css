@@ -799,15 +799,6 @@ section, .hero { padding: clamp(78px, 11vh, 138px) 0; }
   font-style: italic;
 }
 
-/* Курсор — то самое перо: страницу читают, держа его в руке.
-   Только там, где есть мышь; над текстом и ссылками курсор обычный,
-   чтобы не мешать читать и не прятать точку клика. */
-@media (hover: hover) and (pointer: fine) {
-  body { cursor: url("tex/quill-cursor.png") 1 54, auto; }
-  a, button, p, h1, h2, h3, li, .date-chip { cursor: auto; }
-  a, button { cursor: pointer; }
-}
-
 /* ---------- Свет свечи: тёплое дышащее пятно, следует за курсором ---------- */
 .candle {
   position: fixed;
