@@ -35,7 +35,10 @@
 
   var lenis = null;
   if (!reduced && !light && window.Lenis) {
-    lenis = new Lenis({ lerp: .08 }); // неторопливый «книжный» скролл
+    // lerp .08 давал «книжную» вязкость, но читалась она как тормоза:
+    // страница догоняла колесо по полсекунды. .16 — сглаживание ещё есть,
+    // а отклик уже прямой.
+    lenis = new Lenis({ lerp: .16 });
     lenis.on('scroll', function (e) {
       ScrollTrigger.update();
       // лист едва прогибается от скорости прокрутки, затем распрямляется
@@ -103,19 +106,27 @@
       tilt.ry += (tilt.tyr - tilt.ry) * .06;
       tilt.bend += (tilt.bendT - tilt.bend) * .1;
       tilt.bendT *= .92;
-      if (tilt.ready) applySheet();
+      if (!tilt.ready) return;
+      // лист замер — не трогаем стили: запись transform-origin у элемента
+      // высотой в тысячи пикселей на каждом кадре держала GPU в работе
+      // даже на неподвижной странице
+      var still = Math.abs(tilt.txr - tilt.rx) < .003 &&
+                  Math.abs(tilt.tyr - tilt.ry) < .003 &&
+                  Math.abs(tilt.bend) < .003 && Math.abs(tilt.bendT) < .003;
+      if (!still || !tilt.settled) applySheet();
+      tilt.settled = still;
     });
 
     // курсор — на устройствах с мышью
     if (matchMedia('(hover:hover) and (pointer:fine)').matches) {
       addEventListener('mousemove', function (e) {
-        var px = e.clientX / innerWidth - .5;
-        var py = e.clientY / innerHeight - .5;
-        tilt.txr = px * 2.4;
-        tilt.tyr = -py * 1.7;
+        tilt.txr = (e.clientX / innerWidth - .5) * 2.4;
+        tilt.tyr = -(e.clientY / innerHeight - .5) * 1.7;
+        // блик — слой фиксированного размера, двигается только transform:
+        // прежние CSS-переменные центра градиента перерисовывали весь экран
         if (gloss) {
-          gloss.style.setProperty('--mx', (50 + px * 42).toFixed(1) + '%');
-          gloss.style.setProperty('--my', (50 + py * 42).toFixed(1) + '%');
+          gloss.style.transform =
+            'translate(' + e.clientX + 'px,' + e.clientY + 'px)';
         }
       }, { passive: true });
     }
@@ -200,17 +211,20 @@
             scrollTrigger: { trigger: node, start: 'top 86%', once: true }
           });
       } else {
-        // чернила впитываются в кожу; сетки — с лёгкой очерёдностью письма
+        // чернила впитываются в кожу; сетки — с лёгкой очерёдностью письма.
+        // На телефоне — без blur: анимация размытия на карточках во время
+        // скролла дёргала кадры на Android, opacity того же смысла не теряет.
         var delay = 0;
         if (node.matches('.m-card, .f-card, .stat, .format-list li')) {
           delay = Array.prototype.indexOf.call(node.parentElement.children, node) * .08;
         }
-        gsap.fromTo(node,
-          { opacity: 0, filter: 'blur(6px)' },
-          {
-            opacity: 1, filter: 'blur(0px)', duration: 1.2, delay: delay, ease: 'power2.out',
-            scrollTrigger: { trigger: node, start: 'top 88%', once: true }
-          });
+        var from = { opacity: 0 };
+        var to = {
+          opacity: 1, duration: 1.2, delay: delay, ease: 'power2.out',
+          scrollTrigger: { trigger: node, start: 'top 88%', once: true }
+        };
+        if (!light) { from.filter = 'blur(6px)'; to.filter = 'blur(0px)'; }
+        gsap.fromTo(node, from, to);
       }
     });
 
@@ -252,14 +266,15 @@
         .set(seal, { clearProps: 'transform' });
     });
 
-    // главы летописи
+    // главы летописи (на телефоне — тоже без blur, см. выше)
     document.querySelectorAll('.stop').forEach(function (stop) {
-      gsap.fromTo(stop.querySelector('.stop-card'),
-        { opacity: 0, filter: 'blur(5px)' },
-        {
-          opacity: 1, filter: 'blur(0px)', duration: 1.2, ease: 'power2.out',
-          scrollTrigger: { trigger: stop, start: 'top 78%', once: true }
-        });
+      var cardFrom = { opacity: 0 };
+      var cardTo = {
+        opacity: 1, duration: 1.2, ease: 'power2.out',
+        scrollTrigger: { trigger: stop, start: 'top 78%', once: true }
+      };
+      if (!light) { cardFrom.filter = 'blur(5px)'; cardTo.filter = 'blur(0px)'; }
+      gsap.fromTo(stop.querySelector('.stop-card'), cardFrom, cardTo);
       gsap.fromTo(stop.querySelector('.marker'),
         { scale: 1.7, opacity: 0, rotate: -10 },
         {

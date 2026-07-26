@@ -28,9 +28,6 @@
   --mottle: url("tex/mottle.webp");   /* пятнистость выделки, multiply */
   --wood: url("tex/wood.webp");       /* доски стола скриптория */
   --seal: url("tex/seal.webp");       /* сургучная печать с оттиском */
-  --roll-cap: url("tex/roll-cap.webp");   /* край намотки с резным навершием */
-  --roll-cap-r: url("tex/roll-cap-r.webp");
-  --roll-mid: url("tex/roll-mid.webp");   /* трубка намотанного пергамента */
   --quill: url("tex/quill.webp");      /* гусиное перо, остриё в левом нижнем углу */
 }
 
@@ -144,47 +141,67 @@ main > * { position: relative; z-index: 1; }
 }
 .no-js .sheet-skin { border-radius: 3px; }
 
-/* ============ Намотанный край свитка: держит весь лист ============
-   Свиток — не палка поверх листа: пергамент намотан на стержень, снаружи
-   видна трубка бумаги, а дерево торчит только резными навершиями по краям
-   (референс — свиток Торы). Собран из трёх фото-кусков одной съёмки. */
-.rod {
+/* ============ Подвёрнутый край листа ============
+   Валиков нет: край листа сам закручивается внутрь мягким завитком, как у
+   только что развёрнутого документа. Завиток — тот же пергамент (градиент
+   листа + фактура кожи через background-blend-mode), поверх — цилиндрический
+   свет: тёмная дальняя кромка, светлая полоса на скруглении, уход в тень под
+   низ. Контактная тень ложится на лист полосой ::after. Полоса в 44 px —
+   дешёвая: никаких фильтров и блендов на весь экран. */
+.curl {
   position: absolute;
-  left: -34px; right: -34px;
-  height: 58px;
+  left: -3px; right: -3px;
+  height: 44px;
   z-index: 2;
   pointer-events: none;
-  /* Края с навершиями держат свои пропорции, трубка между ними тянется:
-     у неё вдоль всей длины один и тот же цилиндрический градиент, поэтому
-     растяжение не читается (в отличие от повтора, дававшего швы). */
-  background:
-    var(--roll-cap) left center / auto 100% no-repeat,
-    var(--roll-cap-r) right center / auto 100% no-repeat,
-    var(--roll-mid) center / 100% 100% no-repeat;
-  filter: drop-shadow(0 8px 10px rgba(34, 20, 4, .45));
+  border-radius: 4px 4px 2px 2px;
+  background-image:
+    /* цилиндрический свет */
+    linear-gradient(180deg,
+      rgba(92, 58, 18, .38) 0%,
+      rgba(92, 58, 18, .12) 16%,
+      rgba(255, 250, 232, .30) 32%,
+      rgba(255, 250, 232, .05) 52%,
+      rgba(60, 36, 10, .18) 76%,
+      rgba(38, 22, 6, .42) 100%),
+    /* затемнение к торцам, как у кромок листа */
+    linear-gradient(90deg, rgba(110, 74, 28, .2), transparent 44px),
+    linear-gradient(-90deg, rgba(110, 74, 28, .2), transparent 44px),
+    /* сама кожа завитка */
+    var(--vellum),
+    linear-gradient(163deg, var(--paper0) 0%, var(--paper1) 60%, var(--paper2) 100%);
+  background-size: auto, auto, auto, 100% auto, auto;
+  background-blend-mode: normal, normal, normal, multiply, normal;
 }
-/* лист выходит из-под намотки: её тень ложится на пергамент */
-.rod::after {
+/* лист выходит из-под завитка: контактная тень на пергаменте */
+.curl::after {
   content: "";
   position: absolute;
-  left: 48px; right: 48px;
-  height: 26px;
-  background: linear-gradient(180deg, rgba(58, 36, 10, .34), transparent 94%);
+  left: 10px; right: 10px;
+  height: 20px;
+  background: linear-gradient(180deg, rgba(58, 36, 10, .36), transparent 92%);
   filter: blur(3px);
 }
-.rod-top { top: -30px; }
-.rod-top::after { top: 96%; }
-.rod-bottom { bottom: -30px; transform: scaleY(-1); } /* намотка загибается вниз */
-.rod-bottom::after { top: 96%; }
+.curl-top { top: -20px; }
+.curl-top::after { top: 96%; }
+.curl-bottom { bottom: -20px; transform: scaleY(-1); } /* нижний край загибается к себе */
+.curl-bottom::after { top: 96%; }
 
-/* скользящий блик света — фиксирован в окне, поверх листа и стола */
+/* Скользящий блик света — поверх листа и стола. Слой фиксированного размера,
+   курсор двигает его transform'ом: раньше центр градиента задавали CSS-переменные,
+   и каждый сдвиг мыши перерисовывал градиент во весь экран. */
 .sheet-gloss {
   position: fixed;
-  inset: 0;
+  left: 0; top: 0;
+  width: 120vmax;
+  height: 120vmax;
+  margin: -60vmax 0 0 -60vmax;
   z-index: 4;
   pointer-events: none;
-  background: radial-gradient(44% 36% at var(--mx, 50%) var(--my, 42%), rgba(255, 233, 172, .13), transparent 70%);
+  background: radial-gradient(circle, rgba(255, 233, 172, .13), transparent 36%);
   mix-blend-mode: soft-light;
+  transform: translate(50vw, 42vh);
+  will-change: transform;
 }
 
 /* тени больших пальцев — руки держат лист у краёв */
@@ -339,20 +356,6 @@ section, .hero { padding: clamp(78px, 11vh, 138px) 0; }
   pointer-events: none;
 }
 .date-chip b { color: var(--ink); font-weight: 600; }
-
-/* ---------- Орнаментальные уголки ---------- */
-.corner {
-  position: absolute;
-  width: clamp(40px, 6vw, 64px);
-  height: clamp(40px, 6vw, 64px);
-  color: var(--gold-deep);
-  opacity: .7;
-  pointer-events: none;
-}
-.corner.tl { top: 26px; left: 26px; }
-.corner.tr { top: 26px; right: 26px; transform: rotate(90deg); }
-.corner.bl { bottom: 26px; left: 26px; transform: rotate(-90deg); }
-.corner.br { bottom: 26px; right: 26px; transform: rotate(180deg); }
 
 /* ---------- Hero ---------- */
 .hero {
@@ -812,12 +815,15 @@ section, .hero { padding: clamp(78px, 11vh, 138px) 0; }
   font-style: italic;
 }
 
-/* ---------- Свет свечи: тёплое дышащее пятно, следует за курсором ---------- */
+/* ---------- Свет свечи: тёплое пятно, следует за курсором ----------
+   Без «дыхания»: анимация opacity на слое размером с несколько экранов
+   заставляла пересобирать полный кадр непрерывно, даже когда страница
+   стоит на месте, — это и ощущалось как вязкость. Слой ужат до 160vmax. */
 .candle {
   position: fixed;
   left: 0; top: 0;
-  width: 240vmax; height: 240vmax;
-  margin: -120vmax 0 0 -120vmax;
+  width: 160vmax; height: 160vmax;
+  margin: -80vmax 0 0 -80vmax;
   z-index: 4;
   pointer-events: none;
   background: radial-gradient(circle,
@@ -825,32 +831,21 @@ section, .hero { padding: clamp(78px, 11vh, 138px) 0; }
     rgba(140, 95, 30, 0) 15%,
     rgba(70, 44, 10, .18) 30%,
     rgba(34, 20, 5, .38) 47%);
-  animation: candle-breathe 4.6s ease-in-out infinite;
   will-change: transform;
 }
-@keyframes candle-breathe { /* дыхание + едва заметное дрожание пламени */
-  0%, 100% { opacity: .85; }
-  18% { opacity: .97; }
-  33% { opacity: .88; }
-  52% { opacity: 1; }
-  71% { opacity: .9; }
-  86% { opacity: .98; }
-}
-.reduced .candle { animation: none; }
 
 /* ---------- Мобильный лист ---------- */
 @media (max-width: 720px) {
   main { width: calc(100% - 18px); margin-top: 12px; will-change: auto; }
   .sheet-shadow { inset: 12px -8px -14px; filter: blur(14px); }
-  .rod { left: -6px; right: -6px; height: 40px; }  /* навершия целиком в кадре */
-  .rod::after { left: 32px; right: 32px; height: 18px; }
-  .rod-top { top: -20px; }
-  .rod-bottom { bottom: -20px; }
+  .curl { height: 32px; }
+  .curl::after { left: 6px; right: 6px; height: 14px; }
+  .curl-top { top: -15px; }
+  .curl-bottom { bottom: -15px; }
   .trail { padding-left: 14px; padding-right: 14px; }
   .stop { gap: 16px; }
   .marker { width: 44px; height: 44px; font-size: 16px; }
   .stop-card p { max-width: none; }
-  .corner.tr, .corner.bl { display: none; }
   .cta-seal { width: 146px; height: 146px; padding: 0 36px; font-size: 11.5px; letter-spacing: .06em; }
 }
 
@@ -883,9 +878,4 @@ section, .hero { padding: clamp(78px, 11vh, 138px) 0; }
   .sheet-gloss { display: none; }         /* блик под курсор — мыши всё равно нет */
   .thumb { display: none; }
   .dust i:nth-child(n+5) { display: none; }
-  .candle {
-    width: 150vmax; height: 150vmax;
-    margin: -75vmax 0 0 -75vmax;
-    animation: none;                      /* дыхание свечи = перерисовка полного экрана */
-  }
 }

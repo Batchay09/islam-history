@@ -11,9 +11,9 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📜</text></svg>">
 <link rel="preload" href="../vendor/fonts/eb-garamond-var-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="../vendor/fonts/eb-garamond-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../vendor/fonts/eb-garamond.css?v=16">
-<link rel="stylesheet" href="../shared/base.css?v=16">
-<link rel="stylesheet" href="style.css?v=16">
+<link rel="stylesheet" href="../vendor/fonts/eb-garamond.css?v=17">
+<link rel="stylesheet" href="../shared/base.css?v=17">
+<link rel="stylesheet" href="style.css?v=17">
 </head>
 <body>
 <script>document.documentElement.classList.remove('no-js')</script>
@@ -31,16 +31,11 @@
 <main id="sheet">
   <div class="sheet-shadow" aria-hidden="true"></div>
   <div class="sheet-skin" id="sheetSkin" aria-hidden="true"></div>
-  <!-- валики держат весь лист: один сверху, один снизу -->
-  <div class="rod rod-top" aria-hidden="true"></div>
-  <div class="rod rod-bottom" aria-hidden="true"></div>
+  <!-- края листа подвёрнуты завитком: один сверху, один снизу -->
+  <div class="curl curl-top" aria-hidden="true"></div>
+  <div class="curl curl-bottom" aria-hidden="true"></div>
   <!-- ============ HERO ============ -->
   <header class="hero">
-    <svg class="corner tl" viewBox="0 0 60 60" aria-hidden="true"><path d="M2 58 C2 20 20 2 58 2 M2 40 C2 14 14 2 40 2 M10 58 C10 30 30 10 58 10" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="14" cy="14" r="3" fill="currentColor"/></svg>
-    <svg class="corner tr" viewBox="0 0 60 60" aria-hidden="true"><path d="M2 58 C2 20 20 2 58 2 M2 40 C2 14 14 2 40 2 M10 58 C10 30 30 10 58 10" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="14" cy="14" r="3" fill="currentColor"/></svg>
-    <svg class="corner bl" viewBox="0 0 60 60" aria-hidden="true"><path d="M2 58 C2 20 20 2 58 2 M2 40 C2 14 14 2 40 2 M10 58 C10 30 30 10 58 10" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="14" cy="14" r="3" fill="currentColor"/></svg>
-    <svg class="corner br" viewBox="0 0 60 60" aria-hidden="true"><path d="M2 58 C2 20 20 2 58 2 M2 40 C2 14 14 2 40 2 M10 58 C10 30 30 10 58 10" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="14" cy="14" r="3" fill="currentColor"/></svg>
-
     <div class="wrap-narrow hero-inner">
       <p class="eyebrow ink" data-reveal>Набор на первый поток открыт</p>
       <div class="cap-title" data-reveal>
@@ -146,8 +141,6 @@
   <!-- ============ ФИНАЛ ============ -->
   <section class="final page" id="cta">
     <div class="final-card">
-      <svg class="corner tl" viewBox="0 0 60 60" aria-hidden="true"><path d="M2 58 C2 20 20 2 58 2 M2 40 C2 14 14 2 40 2 M10 58 C10 30 30 10 58 10" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="14" cy="14" r="3" fill="currentColor"/></svg>
-      <svg class="corner br" viewBox="0 0 60 60" aria-hidden="true"><path d="M2 58 C2 20 20 2 58 2 M2 40 C2 14 14 2 40 2 M10 58 C10 30 30 10 58 10" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="14" cy="14" r="3" fill="currentColor"/></svg>
       <p class="eyebrow ink" data-reveal>Летопись ждёт читателя</p>
       <h2 data-reveal id="finalTitle"></h2>
       <p class="final-sub" data-reveal id="finalSub"></p>
@@ -162,15 +155,15 @@
 </main>
 </div>
 
-<script src="../vendor/gsap.min.js?v=16"></script>
-<script src="../vendor/ScrollTrigger.min.js?v=16"></script>
-<script src="../vendor/lenis.min.js?v=16"></script>
-<script src="../shared/config.js?v=16"></script>
-<script src="../shared/content.js?v=16"></script>
-<script src="../shared/render.js?v=16"></script>
-<script src="../shared/fx.js?v=16"></script>
-<script src="hand-data.js?v=16"></script>
-<script src="hand-writer.js?v=16"></script>
-<script src="app.js?v=16"></script>
+<script src="../vendor/gsap.min.js?v=17"></script>
+<script src="../vendor/ScrollTrigger.min.js?v=17"></script>
+<script src="../vendor/lenis.min.js?v=17"></script>
+<script src="../shared/config.js?v=17"></script>
+<script src="../shared/content.js?v=17"></script>
+<script src="../shared/render.js?v=17"></script>
+<script src="../shared/fx.js?v=17"></script>
+<script src="hand-data.js?v=17"></script>
+<script src="hand-writer.js?v=17"></script>
+<script src="app.js?v=17"></script>
 </body>
 </html>
