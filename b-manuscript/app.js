@@ -447,7 +447,9 @@
 
   /* ---------- Свеча следует за курсором ---------- */
   var candle = document.querySelector('.candle');
-  if (candle) {
+  // На телефоне свеча — слой ровно по экрану (см. CSS): transform ей не нужен,
+  // а если его поставить, слой съедет и снова полезет за край.
+  if (candle && !light) {
     var cx = innerWidth / 2, cy = innerHeight / 2;
     candle.style.transform = 'translate(' + cx + 'px,' + cy + 'px)';
     if (!reduced && matchMedia('(hover:hover)').matches) {

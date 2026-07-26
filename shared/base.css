@@ -31,7 +31,14 @@ h3 .slw { font-size: .95em; vertical-align: -.08em; }
 
 *, *::before, *::after { box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
+/* Страховка от горизонтального дрейфа. overflow-x: hidden только на body
+   на iOS не держит: слои с position: fixed раздувают layout viewport, и при
+   вертикальном свайпе страница гуляет влево-вправо. clip не делает элемент
+   скролл-контейнером (в отличие от hidden) и не ломает sticky. */
+html { scroll-behavior: smooth; overflow-x: hidden; }
+@supports (overflow-x: clip) {
+  html { overflow-x: clip; }
+}
 html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth { scroll-behavior: auto !important; }
 

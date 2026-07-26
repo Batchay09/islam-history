@@ -738,7 +738,15 @@ section, .hero { padding: clamp(78px, 11vh, 138px) 0; }
   max-width: 520px;
   margin: 0 auto;
 }
-.dest-star { color: var(--gold-deep); margin-bottom: 16px; }
+/* inline-block, а не блок на всю ширину: GSAP держит на звезде
+   scale(1.6) rotate(-12deg) до срабатывания триггера, и растянутый на всю
+   колонку блок этим трансформом распирал страницу по горизонтали. */
+.dest-star {
+  display: inline-block;
+  line-height: 0;
+  color: var(--gold-deep);
+  margin-bottom: 16px;
+}
 .destination h3 { font-size: clamp(23px, 3.5vw, 32px); margin: 10px 0; }
 .dest-sub { color: var(--muted); font-style: italic; }
 
@@ -913,4 +921,20 @@ section, .hero { padding: clamp(78px, 11vh, 138px) 0; }
   .sheet-gloss { display: none; }         /* блик под курсор — мыши всё равно нет */
   .thumb { display: none; }
   .dust i:nth-child(n+5) { display: none; }
+
+  /* Свеча на телефоне никуда не едет — курсора нет. Поэтому вместо квадрата
+     в 160vmax, съезжающего за указателем, ровно экран: гигантский слой
+     торчал на 500 px за правый край, раздувал layout viewport и страница
+     при вертикальном свайпе гуляла влево-вправо. */
+  .candle {
+    inset: 0;
+    width: auto; height: auto;
+    margin: 0;
+    transform: none !important;
+    background: radial-gradient(120% 90% at 50% 42%,
+      rgba(255, 214, 124, .12) 0%,
+      rgba(140, 95, 30, 0) 18%,
+      rgba(70, 44, 10, .16) 42%,
+      rgba(34, 20, 5, .34) 76%);
+  }
 }
