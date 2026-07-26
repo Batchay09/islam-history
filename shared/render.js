@@ -149,14 +149,18 @@
     }
     hits.forEach(function (text) {
       var frag = document.createDocumentFragment();
-      text.nodeValue.split('ﷺ').forEach(function (part, i) {
-        if (i > 0) {
+      var parts = text.nodeValue.split('ﷺ');
+      parts.forEach(function (part, i) {
+        // Пробел перед салаватом делаем неразрывным: иначе лигатура
+        // отрывается от имени и уезжает на свою строку одна
+        if (i < parts.length - 1) part = part.replace(/ $/, ' ');
+        if (part) frag.appendChild(document.createTextNode(part));
+        if (i < parts.length - 1) {
           var s = document.createElement('span');
           s.className = 'slw';
           s.textContent = 'ﷺ';
           frag.appendChild(s);
         }
-        if (part) frag.appendChild(document.createTextNode(part));
       });
       text.parentNode.replaceChild(frag, text);
     });

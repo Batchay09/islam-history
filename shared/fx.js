@@ -10,7 +10,15 @@
     var frag = document.createDocumentFragment();
     parts.forEach(function (part) {
       if (!part) return;
-      if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(' ')); return; }
+      if (/^\s+$/.test(part)) {
+        // Неразрывный пробел сохраняем как есть. \s в JS включает NBSP,
+        // и подмена на обычный пробел возвращала точку переноса там, где её
+        // намеренно убрали, — например перед салаватом ﷺ, который из-за этого
+        // отрывался от имени и уезжал на отдельную строку.
+        frag.appendChild(document.createTextNode(
+          part.indexOf(' ') !== -1 ? ' ' : ' '));
+        return;
+      }
       if (mode === 'words') {
         var w = document.createElement('span');
         w.className = 'fx-w';

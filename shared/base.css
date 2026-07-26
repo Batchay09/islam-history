@@ -25,9 +25,12 @@
   white-space: nowrap;
   margin: 0 .05em;   /* лигатура широкая и без боковых пазух — прилипала к соседям */
 }
-h1 .slw { font-size: .62em; vertical-align: -.02em; }
-h2 .slw { font-size: .78em; vertical-align: -.05em; }
-h3 .slw { font-size: .95em; vertical-align: -.08em; }
+/* В крупных заголовках лигатура без боковых отступов и мельче: строка там
+   и без неё почти заполнена (в hero одно слово «Мухаммада» занимает 86%
+   ширины), и лишние пиксели отрывали салават на отдельную строку. */
+h1 .slw { font-size: .5em; vertical-align: 0; margin: 0; }
+h2 .slw { font-size: .7em; vertical-align: -.04em; margin: 0; }
+h3 .slw { font-size: .95em; vertical-align: -.08em; margin: 0 .03em; }
 
 *, *::before, *::after { box-sizing: border-box; }
 

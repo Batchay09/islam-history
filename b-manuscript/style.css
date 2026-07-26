@@ -27,7 +27,14 @@
      Процедурный шум давал ровную рябь без пор, заломов и следов времени —
      фотография кожи и дерева читается как материал, а не как фильтр.
      Пятнистость выделки осталась процедурной: tools/bake-textures.js. */
-  --vellum: url("tex/vellum.webp");   /* кожа: поры, волоски, заломы */
+  /* Выделка кожи: поры от волосяных фолликулов — опознавательный признак
+     пергамента (по ним отличают кожу от бумаги). Генерируется процедурно,
+     tools/gen-paper.py. Прежняя фотофактура «рябила как морская гладь»:
+     заломы и веер морщин давали анизотропию H/V = 3.09, и лента ещё
+     растягивалась по ширине листа. Здесь шум изотропен по построению
+     (H/V ≈ 1.09) и бесшовен по обеим осям. Класть ТОЛЬКО фиксированной
+     плиткой 512 px: любое растяжение вернёт направленность и рябь. */
+  --vellum: url("tex/paper-pore.webp");
   --mottle: url("tex/mottle.webp");   /* пятнистость выделки, multiply */
   --wood: url("tex/wood.webp");       /* доски стола скриптория */
   --seal: url("tex/seal.webp");       /* сургучная печать с оттиском */
@@ -134,17 +141,17 @@ main > * { position: relative; z-index: 1; }
     inset 0 0 54px rgba(92, 58, 18, .22),
     inset 0 0 10px rgba(92, 58, 18, .12);
 }
-/* Фактура кожи приглушена вдвое: на .5 волокна проходили прямо сквозь
-   очко букв, и текст читался мыльным. Кожа должна быть материалом под
-   текстом, а не шумом поверх него. */
-.sheet-skin::before { /* кожа: поры, волоски, заломы */
+/* Фактура кожи приглушена: на .5 волокна проходили прямо сквозь очко букв,
+   и текст читался мыльным. Кожа должна быть материалом под текстом,
+   а не шумом поверх него. */
+.sheet-skin::before { /* выделка: поры волосяных фолликулов */
   content: "";
   position: absolute;
   inset: 0;
   background-image: var(--vellum);
-  background-size: 100% auto;   /* лента кожи по ширине листа, повтор только вниз */
-  background-repeat: repeat-y;
-  opacity: .26;
+  background-size: 512px;       /* фиксированная плитка: растяжение вернёт рябь */
+  background-repeat: repeat;
+  opacity: .3;
   mix-blend-mode: multiply;
 }
 .sheet-skin::after { /* пятнистость выделки */
@@ -187,7 +194,7 @@ main > * { position: relative; z-index: 1; }
     /* сама кожа завитка */
     var(--vellum),
     linear-gradient(163deg, var(--paper0) 0%, var(--paper1) 60%, var(--paper2) 100%);
-  background-size: auto, auto, auto, 100% auto, auto;
+  background-size: auto, auto, auto, 512px, auto;
   background-blend-mode: normal, normal, normal, multiply, normal;
 }
 /* лист выходит из-под завитка: контактная тень на пергаменте */
@@ -901,7 +908,9 @@ section, .hero { padding: clamp(78px, 11vh, 138px) 0; }
    app.js по тому же признаку (тач вместо мыши). */
 @media (hover: none) {
   :root {
-    --vellum: url("tex/vellum-sm.webp");
+    /* Половинной версии выделки больше нет и не нужно: процедурная плитка
+       весит 58 КБ против 232 КБ у прежней пары фотофактур, и класть её надо
+       ровно в 512 px — уменьшать нельзя, поры смажутся в грязь. */
     --wood: url("tex/wood-sm.webp");
     --seal: url("tex/seal-sm.webp");
   }
@@ -916,7 +925,7 @@ section, .hero { padding: clamp(78px, 11vh, 138px) 0; }
       linear-gradient(-90deg, rgba(110, 74, 28, .16), transparent 30px),
       linear-gradient(163deg, var(--paper0) 0%, var(--paper1) 48%, var(--paper2) 100%);
   }
-  .sheet-skin::before { opacity: .24; }
+  .sheet-skin::before { opacity: .28; }
   .sheet-skin::after { display: none; }   /* второй blend-слой не читается */
   .sheet-gloss { display: none; }         /* блик под курсор — мыши всё равно нет */
   .thumb { display: none; }
