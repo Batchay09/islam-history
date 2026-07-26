@@ -390,7 +390,6 @@
     }
     drop.style.transform = 'translate(' + p.x + 'px,' + p.y + 'px)';
     drop.style.opacity = writing ? 1 : 0;
-    sheet.style.setProperty('--rollx', (s / len * 160).toFixed(1) + 'px');
   }
 
   // перо-писец: заголовки превращаются в рукописные до замера линии,
