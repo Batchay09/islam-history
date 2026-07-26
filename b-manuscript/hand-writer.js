@@ -96,7 +96,7 @@
         var tgt = getTarget(), t = proxy.t;
         var x = from.x + (tgt.x - from.x) * t;
         var y = from.y + (tgt.y - from.y) * t - Math.sin(t * Math.PI) * 46;
-        moveQuill(x, y, -6 - 16 * Math.sin(t * Math.PI));
+        moveQuill(x, y, -34 - 16 * Math.sin(t * Math.PI));
       }
     });
   }
@@ -116,7 +116,7 @@
         var a = it.el.getPointAtLength(Math.min(it.len, s + 2));
         var P = toTrail(it.el, p), A = toTrail(it.el, a);
         var ang = Math.atan2(A.y - P.y, A.x - P.x) * 180 / Math.PI;
-        moveQuill(P.x, P.y, ang * .18 - 8 + Math.sin(s * .3) * 2.5);
+        moveQuill(P.x, P.y, ang * .16 - 36 + Math.sin(s * .3) * 2.2);
       }
     }, at);
     // заливка не блокирует следующую букву — перо уже пишет дальше
@@ -194,7 +194,7 @@
         var t = proxy.t;
         var x = from.x + (back.x - from.x) * t;
         var y = from.y + (back.y - from.y) * t - Math.sin(t * Math.PI) * 40;
-        moveQuill(x, y, back.rot + (-6 - back.rot) * (1 - t));
+        moveQuill(x, y, back.rot + (-34 - back.rot) * (1 - t));
       },
       onComplete: function () {
         var back = window.__trailQuill;
@@ -220,7 +220,7 @@
       var entry = prepare(h3, data);
       ScrollTrigger.create({
         trigger: h3.closest('.stop') || h3.closest('.destination') || h3,
-        start: 'top 80%', // писать сразу, как только карточка появляется
+        start: 'top 66%', // линия успевает дойти до медальона — потом заголовок
         once: true,
         onEnter: function () { enqueue(entry); }
       });

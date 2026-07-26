@@ -1,7 +1,8 @@
 /* Вариант Б «Манускрипт» — лист пергамента на столе скриптория.
-   Материал: слои SVG-шума (волокна + пятнистость выделки), водяные разводы,
-   foxing, заломы, тёмная кромка. Предмет: тёмный дубовый стол, мягкая тень,
-   рваный край (clip-path из app.js), наклон «в руках». Без единой картинки. */
+   Материал: фотофактура кожи + процедурная пятнистость выделки, водяные разводы,
+   foxing, заломы, тёмная кромка. Предмет: доски стола, валики свитка сверху
+   и снизу, сургучная печать, гусиное перо — всё фото с вырезанным фоном
+   (tools/prepare-assets.py). Рваный край — clip-path из app.js. */
 
 :root {
   --paper0: #F2E6C8;
@@ -30,6 +31,7 @@
   --rod-cap: url("tex/rod-cap.webp"); /* резной торец валика */
   --rod-cap-r: url("tex/rod-cap-r.webp");
   --rod-mid: url("tex/rod-mid.webp"); /* тело валика, повторяется по X */
+  --quill: url("tex/quill.webp");      /* гусиное перо, остриё в левом нижнем углу */
 }
 
 /* ============ Стол скриптория ============ */
@@ -126,8 +128,9 @@ main > * { position: relative; z-index: 1; }
   position: absolute;
   inset: 0;
   background-image: var(--vellum);
-  background-size: 840px;
-  opacity: .55;
+  background-size: 100% auto;   /* лента кожи по ширине листа, повтор только вниз */
+  background-repeat: repeat-y;
+  opacity: .5;
   mix-blend-mode: multiply;
 }
 .sheet-skin::after { /* пятнистость выделки */
@@ -140,6 +143,26 @@ main > * { position: relative; z-index: 1; }
   mix-blend-mode: multiply;
 }
 .no-js .sheet-skin { border-radius: 3px; }
+
+/* ============ Валики (умбиликус): держат весь лист ============
+   Каждый собран из трёх фото-кусков: резные торцы по краям фиксированной
+   ширины, тело повторяется по X. Растянуть одну картинку значило бы
+   размазать резьбу, поэтому именно три слоя.
+   --rollx из app.js прокручивает волокна тела — свиток разматывается. */
+.rod {
+  position: absolute;
+  left: -38px; right: -38px;
+  height: 34px;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    var(--rod-cap) left center / auto 100% no-repeat,
+    var(--rod-cap-r) right center / auto 100% no-repeat,
+    var(--rod-mid) var(--rollx, 0) center / auto 100% repeat-x;
+  filter: drop-shadow(0 8px 10px rgba(34, 20, 4, .5)) drop-shadow(0 2px 2px rgba(34, 20, 4, .4));
+}
+.rod-top { top: -17px; }
+.rod-bottom { bottom: -17px; }
 
 /* скользящий блик света — фиксирован в окне, поверх листа и стола */
 .sheet-gloss {
@@ -238,7 +261,13 @@ section, .hero { padding: clamp(78px, 11vh, 138px) 0; }
   height: 168px;
   padding: 0 44px; /* текст держится центрального диска, не заезжает на оттиск */
   position: relative;
-  background: var(--seal) center / contain no-repeat;
+  /* под фотографией — воск градиентами: если WebP не дошёл (медленная сеть,
+     старый браузер), печать всё равно на месте, просто без резьбы */
+  background:
+    var(--seal) center / contain no-repeat,
+    radial-gradient(32% 30% at 34% 26%, rgba(255, 166, 124, .45), transparent 72%) center / 84% 84% no-repeat,
+    radial-gradient(120% 120% at 50% 40%, #A63A22, #8C2F1E 55%, #5E1C10) center / 84% 84% no-repeat;
+  border-radius: 46% 54% 51% 49% / 53% 47% 55% 45%;
   color: #F6DEA8;
   font-family: inherit;
   font-size: 13px;
@@ -483,41 +512,14 @@ section, .hero { padding: clamp(78px, 11vh, 138px) 0; }
 .journey-head { text-align: center; margin-bottom: 56px; }
 .journey-head .section-desc { margin: 0 auto; }
 
+/* Летопись идёт по тому же листу: своего фона и рамок у неё нет —
+   вставка «свитка в свитке» рвала цельность пергамента. */
 .trail {
   position: relative;
   max-width: 820px;
   margin: 0 auto;
-  padding: 74px clamp(20px, 6vw, 72px) 60px;
-  background:
-    radial-gradient(ellipse 7% 4% at 82% 12%, rgba(140, 95, 40, .12), transparent 100%),
-    radial-gradient(ellipse 9% 5% at 16% 78%, rgba(140, 95, 40, .1), transparent 100%),
-    linear-gradient(90deg,
-      rgba(120, 84, 34, .22) 0%, rgba(255, 246, 219, .3) 7%,
-      rgba(255, 246, 219, .42) 50%,
-      rgba(255, 246, 219, .3) 93%, rgba(120, 84, 34, .22) 100%);
-  box-shadow:
-    inset 0 24px 34px -26px rgba(90, 60, 10, .55),
-    inset 0 -24px 34px -26px rgba(90, 60, 10, .55),
-    0 34px 64px -30px rgba(50, 30, 6, .55);
+  padding: 20px clamp(20px, 6vw, 72px) 40px;
 }
-/* Валики свитка (умбиликус): точёное дерево с резными торцами.
-   Собран из трёх фото-кусков — торцы фиксированной ширины по краям,
-   тело повторяется по X, поэтому валик тянется на любую ширину без искажений
-   (растянуть одну картинку значило бы размазать резьбу).
-   --rollx из app.js прокручивает волокна тела при скролле — свиток разматывается. */
-.trail::before, .trail::after {
-  content: "";
-  position: absolute;
-  left: -38px; right: -38px;
-  height: 34px;
-  background:
-    var(--rod-cap) left center / auto 100% no-repeat,
-    var(--rod-cap-r) right center / auto 100% no-repeat,
-    var(--rod-mid) var(--rollx, 0) center / auto 100% repeat-x;
-  filter: drop-shadow(0 7px 9px rgba(34, 20, 4, .5)) drop-shadow(0 2px 2px rgba(34, 20, 4, .4));
-}
-.trail::before { top: -15px; }
-.trail::after { bottom: -15px; }
 
 .trail-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; z-index: 1; }
 #trailBase {
@@ -545,18 +547,25 @@ section, .hero { padding: clamp(78px, 11vh, 138px) 0; }
   pointer-events: none;
 }
 
-/* Перо, пишущее летопись: остриё (8.5,68) в точке пути */
+/* Перо, пишущее летопись: настоящее гусиное, фото с вырезанным фоном.
+   Остриё лежит в левом нижнем углу картинки (1.6% / 99.6% — доли печатает
+   tools/prepare-assets.py), поэтому отрицательные margin ставят именно
+   кончик в точку, которую app.js передаёт в translate. */
 .quill {
   position: absolute;
   top: 0; left: 0;
   z-index: 3;
-  width: 72px; height: 72px;
-  margin: -68px 0 0 -8.5px;
-  transform-origin: 12% 94%;
+  width: 112px; height: 112px;
+  margin: -111px 0 0 -2px;
+  background: var(--quill) center / contain no-repeat;
+  transform-origin: 1.6% 99.6%;
   opacity: 0;
   pointer-events: none;
-  filter: drop-shadow(3px 5px 4px rgba(60, 38, 8, .4));
+  filter: drop-shadow(4px 7px 6px rgba(52, 32, 6, .45));
   will-change: transform;
+}
+@media (max-width: 720px) {
+  .quill { width: 78px; height: 78px; margin: -77px 0 0 -2px; }
 }
 .reduced .quill { display: none; }
 
@@ -790,6 +799,15 @@ section, .hero { padding: clamp(78px, 11vh, 138px) 0; }
   font-style: italic;
 }
 
+/* Курсор — то самое перо: страницу читают, держа его в руке.
+   Только там, где есть мышь; над текстом и ссылками курсор обычный,
+   чтобы не мешать читать и не прятать точку клика. */
+@media (hover: hover) and (pointer: fine) {
+  body { cursor: url("tex/quill-cursor.png") 1 54, auto; }
+  a, button, p, h1, h2, h3, li, .date-chip { cursor: auto; }
+  a, button { cursor: pointer; }
+}
+
 /* ---------- Свет свечи: тёплое дышащее пятно, следует за курсором ---------- */
 .candle {
   position: fixed;
@@ -818,17 +836,51 @@ section, .hero { padding: clamp(78px, 11vh, 138px) 0; }
 
 /* ---------- Мобильный лист ---------- */
 @media (max-width: 720px) {
-  main { width: calc(100% - 18px); margin-top: 12px; }
-  .sheet-shadow { inset: 12px -8px -14px; filter: blur(18px); }
-  .thumb { width: 64px; height: 40px; }
-  .thumb-l { left: 0; transform: translateX(-40%) rotate(26deg); }
-  .thumb-r { right: 0; transform: translateX(40%) rotate(-24deg); }
-  .trail::before, .trail::after { left: -10px; right: -10px; height: 24px; }
-  .trail::before { top: -10px; }
-  .trail::after { bottom: -10px; }
+  main { width: calc(100% - 18px); margin-top: 12px; will-change: auto; }
+  .sheet-shadow { inset: 12px -8px -14px; filter: blur(14px); }
+  .rod { left: -12px; right: -12px; height: 26px; }
+  .rod-top { top: -13px; }
+  .rod-bottom { bottom: -13px; }
+  .trail { padding-left: 14px; padding-right: 14px; }
   .stop { gap: 16px; }
   .marker { width: 44px; height: 44px; font-size: 16px; }
   .stop-card p { max-width: none; }
   .corner.tr, .corner.bl { display: none; }
   .cta-seal { width: 146px; height: 146px; padding: 0 36px; font-size: 11.5px; letter-spacing: .06em; }
+}
+
+/* ---------- Бюджет телефона ----------
+   Основная аудитория — смартфоны, в том числе слабые Android. Тяжело здесь
+   не столько трафик, сколько перерисовка: слои с mix-blend-mode поверх всего
+   экрана и десятки градиентов на листе высотой в десятки тысяч пикселей
+   пересчитываются на каждом кадре скролла. Ниже — облегчённый профиль:
+   половинные текстуры, один блендящийся слой вместо трёх, кожа собирается
+   из шести градиентов вместо двадцати пяти. Наклон листа и Lenis отключает
+   app.js по тому же признаку (тач вместо мыши). */
+@media (hover: none) {
+  :root {
+    --vellum: url("tex/vellum-sm.webp");
+    --wood: url("tex/wood-sm.webp");
+    --seal: url("tex/seal-sm.webp");
+  }
+  body::before { background-size: 520px; }
+  .sheet-skin {
+    background:
+      radial-gradient(110% 26% at 34% 4%, rgba(255, 249, 231, .5), transparent 60%),
+      radial-gradient(ellipse 300px 190px at 8% 39%, transparent 58%, rgba(120, 80, 30, .14) 63%, transparent 70%),
+      linear-gradient(107deg, transparent calc(27% - 9px), rgba(255, 250, 232, .3) calc(27% - 2px), rgba(90, 60, 20, .12) calc(27% + 3px), transparent calc(27% + 12px)),
+      linear-gradient(90deg, rgba(110, 74, 28, .16), transparent 30px),
+      linear-gradient(-90deg, rgba(110, 74, 28, .16), transparent 30px),
+      linear-gradient(163deg, var(--paper0) 0%, var(--paper1) 48%, var(--paper2) 100%);
+  }
+  .sheet-skin::before { opacity: .46; }
+  .sheet-skin::after { display: none; }   /* второй blend-слой не читается */
+  .sheet-gloss { display: none; }         /* блик под курсор — мыши всё равно нет */
+  .thumb { display: none; }
+  .dust i:nth-child(n+5) { display: none; }
+  .candle {
+    width: 150vmax; height: 150vmax;
+    margin: -75vmax 0 0 -75vmax;
+    animation: none;                      /* дыхание свечи = перерисовка полного экрана */
+  }
 }

@@ -12,6 +12,13 @@
   var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (reduced) document.documentElement.classList.add('reduced');
 
+  /* Облегчённый профиль для телефонов (тач = нет мыши). Выключаем всё, что
+     заставляет пересчитывать полный кадр при скролле: наклон листа (transform
+     на элементе высотой в десятки тысяч пикселей), инерционный скролл Lenis
+     со своей rAF-петлёй, частый рваный край. Письмо пера остаётся — оно
+     и есть смысл страницы. */
+  var light = matchMedia('(hover: none)').matches;
+
   window.renderCourse();
   if (window.FX) FX.progress();
 
@@ -27,7 +34,7 @@
   var tilt = { rx: 0, ry: 0, txr: 0, tyr: 0, bend: 0, bendT: 0, ready: false };
 
   var lenis = null;
-  if (!reduced && window.Lenis) {
+  if (!reduced && !light && window.Lenis) {
     lenis = new Lenis({ lerp: .08 }); // неторопливый «книжный» скролл
     lenis.on('scroll', function (e) {
       ScrollTrigger.update();
@@ -72,10 +79,11 @@
         ]);
       }
     }
-    edge(0, 0, w, 0, 26);   // верх
-    edge(w, 0, w, h, 120);  // право
-    edge(w, h, 0, h, 26);   // низ
-    edge(0, h, 0, 0, 120);  // лево
+    var stepX = light ? 64 : 26, stepY = light ? 260 : 120;
+    edge(0, 0, w, 0, stepX);   // верх
+    edge(w, 0, w, h, stepY);   // право
+    edge(w, h, 0, h, stepX);   // низ
+    edge(0, h, 0, 0, stepY);   // лево
     skin.style.clipPath = 'polygon(' + pts.map(function (p) {
       return p[0].toFixed(1) + 'px ' + p[1].toFixed(1) + 'px';
     }).join(',') + ')';
@@ -89,7 +97,7 @@
       'rotateX(' + (tilt.ry + tilt.bend).toFixed(3) + 'deg) rotateY(' + tilt.rx.toFixed(3) + 'deg)';
   }
 
-  if (!reduced) {
+  if (!reduced && !light) {
     gsap.ticker.add(function () {
       tilt.rx += (tilt.txr - tilt.rx) * .06;
       tilt.ry += (tilt.tyr - tilt.ry) * .06;
@@ -112,21 +120,12 @@
       }, { passive: true });
     }
 
-    // гироскоп — там, где события приходят без запроса разрешения (Android)
-    if (matchMedia('(hover:none)').matches && 'DeviceOrientationEvent' in window &&
-        typeof DeviceOrientationEvent.requestPermission !== 'function') {
-      var beta0 = null;
-      addEventListener('deviceorientation', function (e) {
-        if (e.gamma == null || e.beta == null) return;
-        if (beta0 == null) beta0 = e.beta;
-        tilt.txr = Math.max(-2.2, Math.min(2.2, e.gamma / 14));
-        tilt.tyr = Math.max(-1.6, Math.min(1.6, (beta0 - e.beta) / 16));
-      }, { passive: true });
-    }
+    // гироскопа здесь нет намеренно: наклон листа по датчику держал 3D-слой
+    // размером во всю страницу и ронял кадры на слабых Android
   }
 
   /* ---------- Лист опускается на стол ---------- */
-  if (!reduced) {
+  if (!reduced && !light) {
     // точка схода перспективы — в центре первого экрана, а не в середине страницы
     scene.style.perspectiveOrigin = '50% ' + Math.round(innerHeight / 2) + 'px';
     gsap.fromTo(sheet,
@@ -141,6 +140,11 @@
     gsap.fromTo('.sheet-shadow',
       { opacity: .2 }, { opacity: 1, duration: 1.15, ease: 'power3.out' });
     gsap.to('.thumb', { opacity: 1, duration: .9, delay: .8, stagger: .15 });
+  } else if (!reduced) {
+    // телефон: лист просто проявляется — без 3D-слоя на всю страницу
+    gsap.fromTo(sheet, { opacity: 0, y: -14 },
+      { opacity: 1, y: 0, duration: .8, ease: 'power2.out',
+        onComplete: function () { gsap.set(sheet, { clearProps: 'transform,opacity' }); } });
   }
 
   /* ---------- Титры hero: печать буквицы → письмо → росчерк → печать ---------- */
@@ -296,7 +300,12 @@
     });
   });
 
-  /* ---------- Линия летописи: её ведёт перо ---------- */
+  /* ---------- Линия летописи: её ведёт перо ----------
+     Раньше линия была жёстко привязана к скроллу: остановил палец — остановилось
+     перо, дёрнул страницу — линия прыгнула. Теперь скролл только назначает цель,
+     а перо идёт к ней само, с постоянной скоростью руки, и на цели ждёт.
+     Накопился долг (читатель ушёл вперёд) — перо дописывает быстрее, как человек,
+     торопящийся догнать строку. Назад линия не стирается. */
   var trail = document.getElementById('trail');
   var svg = document.getElementById('trailSvg');
   var base = document.getElementById('trailBase');
@@ -304,8 +313,9 @@
   var wetPath = document.getElementById('trailWet');
   var drop = document.getElementById('comet');
   var quill = document.getElementById('quill');
-  var drawTween = null;
-  var WET = 150; // длина «мокрого» следа за пером, px
+  var WET = 150;         // длина «мокрого» следа за пером, px
+  var HAND_SPEED = 520;  // скорость письма, px/с — темп неспешной руки
+  var pen = { s: 0, goal: 0, len: 0 }; // где остриё и куда ведём линию
 
   function buildTrail() {
     var rect = trail.getBoundingClientRect();
@@ -341,39 +351,46 @@
 
     if (reduced) { inkPath.style.strokeDashoffset = 0; return; }
 
-    inkPath.style.strokeDashoffset = len;
+    inkPath.style.strokeDashoffset = Math.max(0, len - pen.s);
     wetPath.style.strokeDasharray = WET + ' ' + len;
-    if (drawTween) { drawTween.scrollTrigger && drawTween.scrollTrigger.kill(); drawTween.kill(); }
-    drawTween = gsap.to(inkPath, {
-      strokeDashoffset: 0,
-      ease: 'none',
-      scrollTrigger: { trigger: trail, start: 'top 62%', end: 'bottom 88%', scrub: .5 },
-      onUpdate: function () {
-        var prog = this.progress();
-        var s = len * prog;
-        var p = inkPath.getPointAtLength(s);
-        var ahead = inkPath.getPointAtLength(Math.min(len, s + 2));
-        var angle = Math.atan2(ahead.y - p.y, ahead.x - p.x) * 180 / Math.PI;
-        var visible = prog > 0 && prog < 1 ? 1 : 0;
-        // живое письмо: перо покачивается и чуть «скребёт» кожу
-        var wobble = Math.sin(s * .16) * 3.4 + Math.sin(s * .53) * 1.6;
-        var press = Math.abs(Math.sin(s * .09)) * 1.6;
-        // актуальная точка линии — сюда перо возвращается после письма заголовков
-        window.__trailQuill = { x: p.x, y: p.y + press, rot: angle * .22 - 10 + wobble, visible: !!visible };
-        if (!window.__quillLock) {
-          quill.style.transform =
-            'translate(' + p.x + 'px,' + (p.y + press) + 'px) rotate(' + (angle * .22 - 10 + wobble) + 'deg)';
-          quill.style.opacity = visible;
-        }
-        // мокрый след: тёмный сегмент сразу за пером, впереди — подсыхает
-        wetPath.style.strokeDashoffset = WET - s;
-        wetPath.style.opacity = visible * .8;
-        drop.style.transform = 'translate(' + p.x + 'px,' + p.y + 'px)';
-        drop.style.opacity = visible;
-        // блики на валиках: свиток «прокручивается» по мере письма
-        trail.style.setProperty('--rollx', (prog * 160).toFixed(1) + 'px');
-      }
-    });
+    pen.len = len;
+  }
+
+  /* Писец: кадр за кадром ведёт остриё к цели, которую назначил скролл. */
+  function penFrame(time, delta) {
+    var len = pen.len;
+    if (!len || pen.s >= pen.goal) return;
+
+    var debt = pen.goal - pen.s;
+    // долг больше экрана — читатель ушёл вперёд, перо дописывает быстрее
+    var speed = HAND_SPEED * (1 + Math.min(3, debt / 900));
+    pen.s = Math.min(pen.goal, pen.s + speed * delta / 1000);
+
+    var s = pen.s;
+    var p = inkPath.getPointAtLength(s);
+    var ahead = inkPath.getPointAtLength(Math.min(len, s + 2));
+    var angle = Math.atan2(ahead.y - p.y, ahead.x - p.x) * 180 / Math.PI;
+    // рука не идёт по линейке: перо покачивается и «скребёт» кожу
+    var wobble = Math.sin(s * .16) * 3.4 + Math.sin(s * .53) * 1.6;
+    var press = Math.abs(Math.sin(s * .09)) * 1.6;
+    var writing = pen.s < pen.goal;
+
+    inkPath.style.strokeDashoffset = len - s;
+    // нажим: рука то давит на перо, то отпускает — линия дышит толщиной
+    inkPath.style.strokeWidth = (1.75 + Math.abs(Math.sin(s * .021)) * .7).toFixed(2);
+    wetPath.style.strokeDashoffset = WET - s;
+    wetPath.style.opacity = writing ? .8 : 0;
+
+    var rot = angle * .18 - 38 + wobble * .7; // круто вверх — перо не ложится на текст
+    window.__trailQuill = { x: p.x, y: p.y + press, rot: rot, visible: s > 0 };
+    if (!window.__quillLock) {
+      quill.style.transform =
+        'translate(' + p.x + 'px,' + (p.y + press) + 'px) rotate(' + rot + 'deg)';
+      quill.style.opacity = s > 0 && s < len ? 1 : 0;
+    }
+    drop.style.transform = 'translate(' + p.x + 'px,' + p.y + 'px)';
+    drop.style.opacity = writing ? 1 : 0;
+    sheet.style.setProperty('--rollx', (s / len * 160).toFixed(1) + 'px');
   }
 
   // перо-писец: заголовки превращаются в рукописные до замера линии,
@@ -387,10 +404,32 @@
     buildTrail();
   });
 
-  // шрифт EB Garamond подгружается со свопом — после него метрики другие
-  if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(function () { ScrollTrigger.refresh(); });
+  if (!reduced) {
+    gsap.ticker.add(penFrame);
+    // Скролл только назначает цель — писать успевает само перо.
+    // Один триггер на всю летопись: создавать их внутри refreshInit нельзя,
+    // на пересчёте это глушило остальные триггеры страницы.
+    ScrollTrigger.create({
+      trigger: trail,
+      start: 'top 78%',
+      end: 'bottom 55%',
+      onUpdate: function (self) {
+        pen.goal = Math.max(pen.goal, self.progress * pen.len);
+      }
+    });
   }
+
+  /* Пересчёт координат триггеров.
+     Рукописные заголовки заменяют двухстрочный текст на SVG в 2.1em, и каждая
+     остановка становится ниже на ~80 px. Одного refresh мало: пока не применён
+     EB Garamond, em считается по подменному шрифту, и главы ниже первой
+     срабатывали по старым позициям — то есть не срабатывали вообще. Поэтому
+     пересчитываем и на следующем кадре, и после load, и с запасом по времени. */
+  function settle() { ScrollTrigger.refresh(); }
+  requestAnimationFrame(settle);
+  addEventListener('load', settle);
+  setTimeout(settle, 1200);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(settle);
 
   /* ---------- Свеча следует за курсором ---------- */
   var candle = document.querySelector('.candle');
