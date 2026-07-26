@@ -19,15 +19,17 @@
   --grain: .05;
   --progress: linear-gradient(90deg, #6E4E1E, #B8912C);
 
-  /* Текстуры запечены из feTurbulence в WebP — tools/bake-textures.js.
-     Процедурный шум пересчитывался на CPU при каждой растеризации и подвешивал
-     Android и WebView Telegram. Правишь текстуру — перегенерируй скриптом. */
-  /* Волокна кожи: мелкий монохромный шум, overlay */
-  --fiber: url("tex/fiber.webp");
-  /* Пятнистость выделки: крупный шум, multiply */
-  --mottle: url("tex/mottle.webp");
-  /* Волокна дуба: шум, растянутый по горизонтали */
-  --wood: url("tex/wood.webp");
+  /* Фотофактуры и предметы: tools/prepare-assets.py (исходники в tools/assets-src).
+     Процедурный шум давал ровную рябь без пор, заломов и следов времени —
+     фотография кожи и дерева читается как материал, а не как фильтр.
+     Пятнистость выделки осталась процедурной: tools/bake-textures.js. */
+  --vellum: url("tex/vellum.webp");   /* кожа: поры, волоски, заломы */
+  --mottle: url("tex/mottle.webp");   /* пятнистость выделки, multiply */
+  --wood: url("tex/wood.webp");       /* доски стола скриптория */
+  --seal: url("tex/seal.webp");       /* сургучная печать с оттиском */
+  --rod-cap: url("tex/rod-cap.webp"); /* резной торец валика */
+  --rod-cap-r: url("tex/rod-cap-r.webp");
+  --rod-mid: url("tex/rod-mid.webp"); /* тело валика, повторяется по X */
 }
 
 /* ============ Стол скриптория ============ */
@@ -41,13 +43,13 @@ body {
     radial-gradient(150% 120% at 50% 55%, transparent 38%, rgba(0, 0, 0, .5) 100%),
     linear-gradient(168deg, #3A2410 0%, #2A1909 52%, #1C1106 100%);
 }
-body::before { /* волокна дерева на столе */
+body::before { /* доски стола: фотофактура поверх тёплого градиента */
   content: "";
   position: fixed;
   inset: 0;
   background-image: var(--wood);
-  background-size: 720px;
-  opacity: .28;
+  background-size: 860px;
+  opacity: .62;
   mix-blend-mode: overlay;
   pointer-events: none;
 }
@@ -119,14 +121,14 @@ main > * { position: relative; z-index: 1; }
     inset 0 0 54px rgba(92, 58, 18, .3),
     inset 0 0 10px rgba(92, 58, 18, .16);
 }
-.sheet-skin::before { /* волокна */
+.sheet-skin::before { /* кожа: поры, волоски, заломы */
   content: "";
   position: absolute;
   inset: 0;
-  background-image: var(--fiber);
-  background-size: 120px;
-  opacity: .15;
-  mix-blend-mode: overlay;
+  background-image: var(--vellum);
+  background-size: 840px;
+  opacity: .55;
+  mix-blend-mode: multiply;
 }
 .sheet-skin::after { /* пятнистость выделки */
   content: "";
@@ -221,55 +223,56 @@ h3 { font-size: clamp(19px, 2.6vw, 25px); }
 
 section, .hero { padding: clamp(78px, 11vh, 138px) 0; }
 
-/* ---------- CTA: сургучная печать ---------- */
+/* ---------- CTA: сургучная печать ----------
+   Воск — фотография с вырезанным фоном (tex/seal.webp): наплывы по краю,
+   оттиск арабески и золочение по рельефу CSS-градиентами не набираются.
+   Объём держат две drop-shadow: дальняя мягкая (печать лежит на листе)
+   и короткая контактная. Тень именно drop-shadow, а не box-shadow, —
+   она обводит рваный контур воска, а не прямоугольник элемента. */
 .cta-seal {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  width: 136px;
-  height: 136px;
-  padding: 20px;
+  width: 168px;
+  height: 168px;
+  padding: 0 44px; /* текст держится центрального диска, не заезжает на оттиск */
   position: relative;
-  border-radius: 46% 54% 51% 49% / 53% 47% 55% 45%;
-  background:
-    radial-gradient(32% 30% at 34% 26%, rgba(255, 166, 124, .5), transparent 72%),
-    radial-gradient(92% 92% at 62% 70%, #5E1A0E, transparent 76%),
-    radial-gradient(120% 120% at 50% 40%, #A63A22, #8C2F1E 55%, #5E1C10);
-  box-shadow:
-    inset 0 3px 6px rgba(255, 190, 150, .34),
-    inset 0 -6px 10px rgba(40, 8, 2, .55),
-    0 12px 26px -8px rgba(0, 0, 0, .65);
-  color: #F8E4CC;
+  background: var(--seal) center / contain no-repeat;
+  color: #F6DEA8;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
-  line-height: 1.3;
-  letter-spacing: .07em;
+  line-height: 1.34;
+  letter-spacing: .075em;
   text-transform: uppercase;
   text-decoration: none;
   hyphens: none;
-  text-shadow: 0 -1px 0 rgba(60, 10, 2, .65), 0 1px 1px rgba(255, 190, 150, .28); /* тиснение в воске */
-  transition: transform .18s cubic-bezier(.3, .8, .4, 1), box-shadow .18s;
+  /* тиснение: свет сверху по фаске, тень внутрь воска */
+  text-shadow:
+    0 -1px 0 rgba(46, 6, 2, .9),
+    0 1px 0 rgba(255, 214, 160, .3),
+    0 2px 5px rgba(30, 4, 1, .7);
+  filter:
+    drop-shadow(0 14px 18px rgba(20, 6, 1, .55))
+    drop-shadow(0 3px 3px rgba(20, 6, 1, .45));
+  transform: rotate(-4deg);
+  transition: transform .2s cubic-bezier(.3, .8, .4, 1), filter .2s;
   will-change: transform;
 }
-.cta-seal::before { /* внутренний обод оттиска */
-  content: "";
-  position: absolute;
-  inset: 11%;
-  border-radius: inherit;
-  border: 1.6px solid rgba(255, 200, 160, .4);
-  box-shadow: inset 0 2px 5px rgba(40, 8, 2, .5);
-  pointer-events: none;
+.cta-seal:hover {
+  transform: rotate(-4deg) scale(1.035);
+  filter:
+    drop-shadow(0 20px 26px rgba(20, 6, 1, .6))
+    drop-shadow(0 4px 4px rgba(20, 6, 1, .45));
 }
-.cta-seal:hover { transform: scale(.97); }
-.cta-seal:active {
-  transform: scale(.93);
-  box-shadow:
-    inset 0 5px 9px rgba(40, 8, 2, .7),
-    0 4px 10px -4px rgba(0, 0, 0, .6);
+.cta-seal:active { /* печать вдавливают в лист: тень схлопывается */
+  transform: rotate(-4deg) scale(.97);
+  filter:
+    drop-shadow(0 5px 7px rgba(20, 6, 1, .5))
+    drop-shadow(0 1px 2px rgba(20, 6, 1, .4));
 }
-.cta-seal:focus-visible { outline: 2px solid var(--gold); outline-offset: 5px; }
+.cta-seal:focus-visible { outline: 2px solid var(--gold); outline-offset: 6px; border-radius: 50%; }
 
 /* ---------- Дата старта: оттиск чернильного штампа ---------- */
 .date-chip {
@@ -489,32 +492,29 @@ section, .hero { padding: clamp(78px, 11vh, 138px) 0; }
     radial-gradient(ellipse 7% 4% at 82% 12%, rgba(140, 95, 40, .12), transparent 100%),
     radial-gradient(ellipse 9% 5% at 16% 78%, rgba(140, 95, 40, .1), transparent 100%),
     linear-gradient(90deg,
-      rgba(120, 84, 34, .18) 0%, rgba(255, 250, 235, .5) 7%,
-      rgba(255, 250, 235, .65) 50%,
-      rgba(255, 250, 235, .5) 93%, rgba(120, 84, 34, .18) 100%);
+      rgba(120, 84, 34, .22) 0%, rgba(255, 246, 219, .3) 7%,
+      rgba(255, 246, 219, .42) 50%,
+      rgba(255, 246, 219, .3) 93%, rgba(120, 84, 34, .22) 100%);
   box-shadow:
     inset 0 24px 34px -26px rgba(90, 60, 10, .55),
     inset 0 -24px 34px -26px rgba(90, 60, 10, .55),
     0 34px 64px -30px rgba(50, 30, 6, .55);
 }
-/* валики свитка; бегущий блик управляется --rollx из app.js */
+/* Валики свитка (умбиликус): точёное дерево с резными торцами.
+   Собран из трёх фото-кусков — торцы фиксированной ширины по краям,
+   тело повторяется по X, поэтому валик тянется на любую ширину без искажений
+   (растянуть одну картинку значило бы размазать резьбу).
+   --rollx из app.js прокручивает волокна тела при скролле — свиток разматывается. */
 .trail::before, .trail::after {
   content: "";
   position: absolute;
-  left: -22px; right: -22px;
-  height: 30px;
-  border-radius: 15px;
+  left: -38px; right: -38px;
+  height: 34px;
   background:
-    repeating-linear-gradient(90deg,
-      rgba(255, 246, 220, 0) 0 34px,
-      rgba(255, 246, 220, .14) 40px 46px,
-      rgba(255, 246, 220, 0) 52px 86px),
-    linear-gradient(180deg, #D9BE8C 0%, #B08F52 45%, #7A5A24 100%);
-  background-position: var(--rollx, 0) 0, 0 0;
-  box-shadow:
-    inset 0 3px 5px rgba(255, 245, 220, .55),
-    inset 0 -4px 6px rgba(60, 38, 8, .5),
-    0 10px 24px -8px rgba(60, 38, 8, .5);
+    var(--rod-cap) left center / auto 100% no-repeat,
+    var(--rod-cap-r) right center / auto 100% no-repeat,
+    var(--rod-mid) var(--rollx, 0) center / auto 100% repeat-x;
+  filter: drop-shadow(0 7px 9px rgba(34, 20, 4, .5)) drop-shadow(0 2px 2px rgba(34, 20, 4, .4));
 }
 .trail::before { top: -15px; }
 .trail::after { bottom: -15px; }
@@ -823,10 +823,12 @@ section, .hero { padding: clamp(78px, 11vh, 138px) 0; }
   .thumb { width: 64px; height: 40px; }
   .thumb-l { left: 0; transform: translateX(-40%) rotate(26deg); }
   .thumb-r { right: 0; transform: translateX(40%) rotate(-24deg); }
-  .trail::before, .trail::after { left: -8px; right: -8px; }
+  .trail::before, .trail::after { left: -10px; right: -10px; height: 24px; }
+  .trail::before { top: -10px; }
+  .trail::after { bottom: -10px; }
   .stop { gap: 16px; }
   .marker { width: 44px; height: 44px; font-size: 16px; }
   .stop-card p { max-width: none; }
   .corner.tr, .corner.bl { display: none; }
-  .cta-seal { width: 124px; height: 124px; font-size: 13.5px; }
+  .cta-seal { width: 146px; height: 146px; padding: 0 36px; font-size: 11.5px; letter-spacing: .06em; }
 }

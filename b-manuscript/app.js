@@ -168,10 +168,12 @@
       // сургучная печать шлёпается в лист
       .set('.hero .hero-cta', { opacity: 1 }, 2.95)
       .fromTo('.hero .cta-seal',
-        { opacity: 0, scale: 1.7, rotate: -8 },
-        { opacity: 1, scale: 1, rotate: 0, duration: .38, ease: 'power3.in' }, 3)
+        { opacity: 0, scale: 1.7, rotate: -14 },
+        { opacity: 1, scale: 1, rotate: -4, duration: .38, ease: 'power3.in' }, 3)
       .to('.hero .cta-seal', { scale: .94, duration: .09, ease: 'power1.out' }, 3.38)
       .to('.hero .cta-seal', { scale: 1, duration: .3, ease: 'back.out(2.6)' }, 3.47)
+      // inline-transform от GSAP перебил бы :hover — отдаём печать обратно CSS
+      .set('.hero .cta-seal', { clearProps: 'transform' }, 3.8)
       .fromTo('.hero .date-chip', { opacity: 0, filter: 'blur(4px)' }, { opacity: 1, filter: 'blur(0px)', duration: .8 }, 3.5)
       .fromTo('.scroll-hint', { opacity: 0 }, { opacity: 1, duration: .9 }, 3.9);
 
@@ -239,10 +241,11 @@
       gsap.timeline({
         scrollTrigger: { trigger: seal, start: 'top 88%', once: true }
       })
-        .fromTo(seal, { opacity: 0, scale: 1.7, rotate: -8 },
-          { opacity: 1, scale: 1, rotate: 0, duration: .38, ease: 'power3.in' })
+        .fromTo(seal, { opacity: 0, scale: 1.7, rotate: -14 },
+          { opacity: 1, scale: 1, rotate: -4, duration: .38, ease: 'power3.in' })
         .to(seal, { scale: .94, duration: .09, ease: 'power1.out' })
-        .to(seal, { scale: 1, duration: .3, ease: 'back.out(2.6)' });
+        .to(seal, { scale: 1, duration: .3, ease: 'back.out(2.6)' })
+        .set(seal, { clearProps: 'transform' });
     });
 
     // главы летописи
