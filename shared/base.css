@@ -1,5 +1,34 @@
 /* Общий фундамент трёх вариантов: reset, типографика, утилиты */
 
+/* Салават ﷺ (U+FDFA). Ни в одном из наших текстовых шрифтов этого глифа нет,
+   и браузер подставлял системный арабский — лигатура выезжала микроскопической
+   нечитаемой кляксой и ломала строку. Здесь — вырезка из Amiri ровно на два
+   символа (2 КБ), unicode-range держит загрузку только под них. Семейство
+   ставится ПЕРВЫМ в стеке — иначе системный шрифт с этим глифом перехватит
+   символ раньше нашего. Кегль задаёт .slw, а не size-adjust: см. ниже. */
+@font-face {
+  font-family: "Salawat";
+  src: url("../vendor/fonts/amiri-salawat.woff2") format("woff2");
+  unicode-range: U+FDFA, U+FDFB;
+  font-display: swap;
+}
+
+/* Обёртку ставит wrapSalawat() в render.js. Лигатура сложная: в мелком тексте
+   её надо укрупнять, иначе внутренние штрихи слипаются, а в крупном заголовке
+   она и так разборчива — там множитель наоборот уменьшаем, чтобы не наезжала
+   на соседние буквы и не рвала строку. */
+.slw {
+  font-family: "Salawat", serif;
+  font-size: 1.5em;
+  line-height: 0;
+  vertical-align: -.14em;
+  white-space: nowrap;
+  margin: 0 .05em;   /* лигатура широкая и без боковых пазух — прилипала к соседям */
+}
+h1 .slw { font-size: .62em; vertical-align: -.02em; }
+h2 .slw { font-size: .78em; vertical-align: -.05em; }
+h3 .slw { font-size: .95em; vertical-align: -.08em; }
+
 *, *::before, *::after { box-sizing: border-box; }
 
 html { scroll-behavior: smooth; }
@@ -8,7 +37,7 @@ html.lenis, html.lenis body { height: auto; }
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: "Salawat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   line-height: 1.65;
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
@@ -16,7 +45,7 @@ body {
 }
 
 h1, h2, h3, h4 {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: "Salawat", Georgia, "Times New Roman", serif;
   font-weight: 600;
   line-height: 1.22;
   margin: 0;

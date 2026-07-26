@@ -128,5 +128,37 @@
     document.querySelectorAll('[data-start-chip]').forEach(function (chip) {
       chip.innerHTML = '<b>Старт: ' + CFG.startDate + '</b>' + (CFG.startDateNote ? ' · ' + CFG.startDateNote : '');
     });
+
+    wrapSalawat(document.body);
   };
+
+  /* Салават ﷺ (U+FDFA) заворачиваем в <span class="slw">, чтобы кегль лигатуры
+     задавался отдельно от текста. Через size-adjust у @font-face не выходит:
+     он множит кегль пропорционально, а лигатуре нужно обратное — в мелком
+     тексте её надо укрупнять, а в 92-пиксельном заголовке она и так велика
+     и при множителе наезжала на соседние буквы. */
+  function wrapSalawat(root) {
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    var hits = [];
+    var node;
+    while ((node = walker.nextNode())) {
+      if (node.nodeValue.indexOf('ﷺ') !== -1 &&
+          !(node.parentElement && node.parentElement.classList.contains('slw'))) {
+        hits.push(node);
+      }
+    }
+    hits.forEach(function (text) {
+      var frag = document.createDocumentFragment();
+      text.nodeValue.split('ﷺ').forEach(function (part, i) {
+        if (i > 0) {
+          var s = document.createElement('span');
+          s.className = 'slw';
+          s.textContent = 'ﷺ';
+          frag.appendChild(s);
+        }
+        if (part) frag.appendChild(document.createTextNode(part));
+      });
+      text.parentNode.replaceChild(frag, text);
+    });
+  }
 })();
