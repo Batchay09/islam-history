@@ -28,9 +28,9 @@
   --mottle: url("tex/mottle.webp");   /* пятнистость выделки, multiply */
   --wood: url("tex/wood.webp");       /* доски стола скриптория */
   --seal: url("tex/seal.webp");       /* сургучная печать с оттиском */
-  --rod-cap: url("tex/rod-cap.webp"); /* резной торец валика */
-  --rod-cap-r: url("tex/rod-cap-r.webp");
-  --rod-mid: url("tex/rod-mid.webp"); /* тело валика, повторяется по X */
+  --roll-cap: url("tex/roll-cap.webp");   /* край намотки с резным навершием */
+  --roll-cap-r: url("tex/roll-cap-r.webp");
+  --roll-mid: url("tex/roll-mid.webp");   /* трубка намотанного пергамента */
   --quill: url("tex/quill.webp");      /* гусиное перо, остриё в левом нижнем углу */
 }
 
@@ -144,40 +144,38 @@ main > * { position: relative; z-index: 1; }
 }
 .no-js .sheet-skin { border-radius: 3px; }
 
-/* ============ Валики (умбиликус): держат весь лист ============
-   Каждый собран из трёх фото-кусков: резные торцы по краям фиксированной
-   ширины, тело между ними растягивается. Резьба при этом не тянется —
-   она живёт в торцах, которые сохраняют свои пропорции. */
+/* ============ Намотанный край свитка: держит весь лист ============
+   Свиток — не палка поверх листа: пергамент намотан на стержень, снаружи
+   видна трубка бумаги, а дерево торчит только резными навершиями по краям
+   (референс — свиток Торы). Собран из трёх фото-кусков одной съёмки. */
 .rod {
   position: absolute;
-  left: -52px; right: -52px;
-  height: 60px;
+  left: -34px; right: -34px;
+  height: 58px;
   z-index: 2;
   pointer-events: none;
-  /* Резное навершие шире ствола, поэтому торцы занимают всю высоту полосы,
-     а тело — 54% по центру (долю печатает tools/prepare-assets.py).
-     Тело именно растягивается, а не повторяется: у повтора на каждом стыке
-     была видна вертикальная линия, валик выглядел склеенным из плиток.
-     Волокна идут вдоль, поэтому растяжение читается как длинное точёное дерево. */
+  /* Края с навершиями держат свои пропорции, трубка между ними тянется:
+     у неё вдоль всей длины один и тот же цилиндрический градиент, поэтому
+     растяжение не читается (в отличие от повтора, дававшего швы). */
   background:
-    var(--rod-cap) left center / auto 100% no-repeat,
-    var(--rod-cap-r) right center / auto 100% no-repeat,
-    var(--rod-mid) center / 100% 54% no-repeat;
-  filter: drop-shadow(0 9px 11px rgba(34, 20, 4, .5)) drop-shadow(0 2px 3px rgba(34, 20, 4, .45));
+    var(--roll-cap) left center / auto 100% no-repeat,
+    var(--roll-cap-r) right center / auto 100% no-repeat,
+    var(--roll-mid) center / 100% 100% no-repeat;
+  filter: drop-shadow(0 8px 10px rgba(34, 20, 4, .45));
 }
-/* лист уходит под валик: тень от него ложится на пергамент */
+/* лист выходит из-под намотки: её тень ложится на пергамент */
 .rod::after {
   content: "";
   position: absolute;
-  left: 62px; right: 62px;
-  height: 24px;
-  background: linear-gradient(180deg, rgba(58, 36, 10, .3), transparent 92%);
+  left: 48px; right: 48px;
+  height: 26px;
+  background: linear-gradient(180deg, rgba(58, 36, 10, .34), transparent 94%);
   filter: blur(3px);
 }
 .rod-top { top: -30px; }
-.rod-top::after { top: 100%; }
-.rod-bottom { bottom: -30px; }
-.rod-bottom::after { bottom: 100%; transform: scaleY(-1); }
+.rod-top::after { top: 96%; }
+.rod-bottom { bottom: -30px; transform: scaleY(-1); } /* намотка загибается вниз */
+.rod-bottom::after { top: 96%; }
 
 /* скользящий блик света — фиксирован в окне, поверх листа и стола */
 .sheet-gloss {
@@ -844,10 +842,10 @@ section, .hero { padding: clamp(78px, 11vh, 138px) 0; }
 @media (max-width: 720px) {
   main { width: calc(100% - 18px); margin-top: 12px; will-change: auto; }
   .sheet-shadow { inset: 12px -8px -14px; filter: blur(14px); }
-  .rod { left: -16px; right: -16px; height: 42px; }
-  .rod::after { left: 40px; right: 40px; height: 16px; }
-  .rod-top { top: -21px; }
-  .rod-bottom { bottom: -21px; }
+  .rod { left: -6px; right: -6px; height: 40px; }  /* навершия целиком в кадре */
+  .rod::after { left: 32px; right: 32px; height: 18px; }
+  .rod-top { top: -20px; }
+  .rod-bottom { bottom: -20px; }
   .trail { padding-left: 14px; padding-right: 14px; }
   .stop { gap: 16px; }
   .marker { width: 44px; height: 44px; font-size: 16px; }
