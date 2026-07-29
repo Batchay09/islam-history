@@ -38,7 +38,7 @@
   --mottle: url("tex/mottle.webp");   /* пятнистость выделки, multiply */
   --wood: url("tex/wood.webp");       /* доски стола скриптория */
   --seal: url("tex/seal.webp");       /* сургучная печать с оттиском */
-  --quill: url("tex/quill.webp");      /* гусиное перо, остриё в левом нижнем углу */
+  /* перо не ассет, а SVG в разметке — фото tex/quill.webp лежит про запас */
 }
 
 /* ============ Стол скриптория ============ */
@@ -599,25 +599,20 @@ section, .hero { padding: clamp(78px, 11vh, 138px) 0; }
   pointer-events: none;
 }
 
-/* Перо, пишущее летопись: настоящее гусиное, фото с вырезанным фоном.
-   Остриё лежит в левом нижнем углу картинки (1.6% / 99.6% — доли печатает
-   tools/prepare-assets.py), поэтому отрицательные margin ставят именно
-   кончик в точку, которую app.js передаёт в translate. */
+/* Перо, пишущее летопись: золотое, рисованное SVG (разметка в index.html).
+   Остриё — точка (8.5, 68) внутри вьюбокса 72×72, поэтому отрицательные
+   margin ставят именно кончик в точку, которую app.js передаёт в translate. */
 .quill {
   position: absolute;
   top: 0; left: 0;
   z-index: 3;
-  width: 112px; height: 112px;
-  margin: -111px 0 0 -2px;
-  background: var(--quill) center / contain no-repeat;
-  transform-origin: 1.6% 99.6%;
+  width: 72px; height: 72px;
+  margin: -68px 0 0 -8.5px;
+  transform-origin: 12% 94%;
   opacity: 0;
   pointer-events: none;
-  filter: drop-shadow(4px 7px 6px rgba(52, 32, 6, .45));
+  filter: drop-shadow(3px 5px 4px rgba(60, 38, 8, .4));
   will-change: transform;
-}
-@media (max-width: 720px) {
-  .quill { width: 78px; height: 78px; margin: -77px 0 0 -2px; }
 }
 .reduced .quill { display: none; }
 

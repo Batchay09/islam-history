@@ -11,9 +11,9 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📜</text></svg>">
 <link rel="preload" href="../vendor/fonts/eb-garamond-var-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="../vendor/fonts/eb-garamond-var-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../vendor/fonts/eb-garamond.css?v=27">
-<link rel="stylesheet" href="../shared/base.css?v=27">
-<link rel="stylesheet" href="style.css?v=27">
+<link rel="stylesheet" href="../vendor/fonts/eb-garamond.css?v=28">
+<link rel="stylesheet" href="../shared/base.css?v=28">
+<link rel="stylesheet" href="style.css?v=28">
 </head>
 <body>
 <script>document.documentElement.classList.remove('no-js')</script>
@@ -92,7 +92,23 @@
         <path id="trailWet" />
       </svg>
       <div class="comet" id="comet" aria-hidden="true"></div>
-      <div class="quill" id="quill" aria-hidden="true"></div>
+      <div class="quill" id="quill" aria-hidden="true">
+        <svg viewBox="0 0 72 72" width="72" height="72">
+          <!-- тень пера на бумаге -->
+          <ellipse cx="16" cy="64" rx="10" ry="2.6" fill="rgba(60,38,8,.25)"/>
+          <!-- левая бородка -->
+          <path d="M12 62 C 15 46, 22 30, 40 14 C 36 26, 33 38, 27 48 C 22 55, 17 60, 12 62 Z" fill="#A8813A"/>
+          <!-- правая бородка -->
+          <path d="M12 62 C 20 50, 30 34, 54 10 C 56 20, 53 32, 45 42 C 36 53, 24 60, 12 62 Z" fill="#C29A4A"/>
+          <!-- прожилки -->
+          <path d="M22 50 C 30 44, 38 34, 48 22 M18 55 C 26 49, 33 41, 41 32" fill="none" stroke="rgba(90,60,14,.45)" stroke-width="1"/>
+          <!-- стержень -->
+          <path d="M12 62 C 18 50, 30 32, 54 10" fill="none" stroke="#5A4212" stroke-width="2" stroke-linecap="round"/>
+          <!-- кончик-остриё с чернилами -->
+          <path d="M12 62 L 8.5 68" stroke="#2A1B08" stroke-width="2.6" stroke-linecap="round"/>
+          <circle cx="8.5" cy="68" r="1.8" fill="#2A1B08"/>
+        </svg>
+      </div>
       <div class="destination" id="destination">
         <div class="dest-star" aria-hidden="true">
           <svg viewBox="0 0 48 48" width="48" height="48"><circle cx="24" cy="24" r="21" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="24" cy="24" r="16.5" fill="none" stroke="currentColor" stroke-width=".8"/><path d="M24 9l3.5 10.8H38l-8.6 6.2 3.3 10.7L24 30l-8.7 6.7 3.3-10.7L10 19.8h10.5Z" fill="currentColor"/></svg>
@@ -155,15 +171,15 @@
 </main>
 </div>
 
-<script src="../vendor/gsap.min.js?v=27"></script>
-<script src="../vendor/ScrollTrigger.min.js?v=27"></script>
-<script src="../vendor/lenis.min.js?v=27"></script>
-<script src="../shared/config.js?v=27"></script>
-<script src="../shared/content.js?v=27"></script>
-<script src="../shared/render.js?v=27"></script>
-<script src="../shared/fx.js?v=27"></script>
-<script src="hand-data.js?v=27"></script>
-<script src="hand-writer.js?v=27"></script>
-<script src="app.js?v=27"></script>
+<script src="../vendor/gsap.min.js?v=28"></script>
+<script src="../vendor/ScrollTrigger.min.js?v=28"></script>
+<script src="../vendor/lenis.min.js?v=28"></script>
+<script src="../shared/config.js?v=28"></script>
+<script src="../shared/content.js?v=28"></script>
+<script src="../shared/render.js?v=28"></script>
+<script src="../shared/fx.js?v=28"></script>
+<script src="hand-data.js?v=28"></script>
+<script src="hand-writer.js?v=28"></script>
+<script src="app.js?v=28"></script>
 </body>
 </html>
